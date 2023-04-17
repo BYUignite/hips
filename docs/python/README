@@ -1,0 +1,3 @@
+Python Version of the HiPS code
+- The main code is in python.py, which uses streams.py.
+- Simplified version of HiPS, good for understanding how the HiPS code works.
