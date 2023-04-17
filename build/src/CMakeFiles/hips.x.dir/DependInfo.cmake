@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/me/codes/reactHips/hips/src/cvodeDriver.cc" "src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o.d"
-  "/Users/me/codes/reactHips/hips/src/driver.cc" "src/CMakeFiles/hips.x.dir/driver.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/driver.cc.o.d"
-  "/Users/me/codes/reactHips/hips/src/hips.cc" "src/CMakeFiles/hips.x.dir/hips.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/hips.cc.o.d"
+  "/Users/me/codes/gitTest/hips/src/cvodeDriver.cc" "src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o.d"
+  "/Users/me/codes/gitTest/hips/src/driver.cc" "src/CMakeFiles/hips.x.dir/driver.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/driver.cc.o.d"
+  "/Users/me/codes/gitTest/hips/src/hips.cc" "src/CMakeFiles/hips.x.dir/hips.cc.o" "gcc" "src/CMakeFiles/hips.x.dir/hips.cc.o.d"
   )
 
 # Targets to which this target links.

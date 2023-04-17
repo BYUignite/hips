@@ -57,10 +57,10 @@ RM = /usr/local/Cellar/cmake/3.23.2/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/me/codes/reactHips/hips
+CMAKE_SOURCE_DIR = /Users/me/codes/gitTest/hips
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/me/codes/reactHips/hips/build
+CMAKE_BINARY_DIR = /Users/me/codes/gitTest/hips/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/me/codes/reactHips/hips/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/reactHips/hips/build/CMakeFiles /Users/me/codes/reactHips/hips/build/src//CMakeFiles/progress.marks
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/reactHips/hips/build/CMakeFiles 0
+	cd /Users/me/codes/gitTest/hips/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/gitTest/hips/build/CMakeFiles /Users/me/codes/gitTest/hips/build/src//CMakeFiles/progress.marks
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/gitTest/hips/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/clean
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/me/codes/reactHips/hips/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/me/codes/gitTest/hips/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/hips.x.dir/rule:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/hips.x.dir/rule
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/hips.x.dir/rule
 .PHONY : src/CMakeFiles/hips.x.dir/rule
 
 # Convenience name for target.
@@ -172,7 +172,7 @@ hips.x: src/CMakeFiles/hips.x.dir/rule
 
 # fast build rule for target.
 hips.x/fast:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/build
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/build
 .PHONY : hips.x/fast
 
 cvodeDriver.o: cvodeDriver.cc.o
@@ -180,7 +180,7 @@ cvodeDriver.o: cvodeDriver.cc.o
 
 # target to build an object file
 cvodeDriver.cc.o:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o
 .PHONY : cvodeDriver.cc.o
 
 cvodeDriver.i: cvodeDriver.cc.i
@@ -188,7 +188,7 @@ cvodeDriver.i: cvodeDriver.cc.i
 
 # target to preprocess a source file
 cvodeDriver.cc.i:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.i
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.i
 .PHONY : cvodeDriver.cc.i
 
 cvodeDriver.s: cvodeDriver.cc.s
@@ -196,7 +196,7 @@ cvodeDriver.s: cvodeDriver.cc.s
 
 # target to generate assembly for a file
 cvodeDriver.cc.s:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.s
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/cvodeDriver.cc.s
 .PHONY : cvodeDriver.cc.s
 
 driver.o: driver.cc.o
@@ -204,7 +204,7 @@ driver.o: driver.cc.o
 
 # target to build an object file
 driver.cc.o:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.o
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.o
 .PHONY : driver.cc.o
 
 driver.i: driver.cc.i
@@ -212,7 +212,7 @@ driver.i: driver.cc.i
 
 # target to preprocess a source file
 driver.cc.i:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.i
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.i
 .PHONY : driver.cc.i
 
 driver.s: driver.cc.s
@@ -220,7 +220,7 @@ driver.s: driver.cc.s
 
 # target to generate assembly for a file
 driver.cc.s:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.s
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/driver.cc.s
 .PHONY : driver.cc.s
 
 hips.o: hips.cc.o
@@ -228,7 +228,7 @@ hips.o: hips.cc.o
 
 # target to build an object file
 hips.cc.o:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.o
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.o
 .PHONY : hips.cc.o
 
 hips.i: hips.cc.i
@@ -236,7 +236,7 @@ hips.i: hips.cc.i
 
 # target to preprocess a source file
 hips.cc.i:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.i
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.i
 .PHONY : hips.cc.i
 
 hips.s: hips.cc.s
@@ -244,7 +244,7 @@ hips.s: hips.cc.s
 
 # target to generate assembly for a file
 hips.cc.s:
-	cd /Users/me/codes/reactHips/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.s
+	cd /Users/me/codes/gitTest/hips/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/hips.x.dir/build.make src/CMakeFiles/hips.x.dir/hips.cc.s
 .PHONY : hips.cc.s
 
 # Help Target
@@ -280,6 +280,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/me/codes/reactHips/hips/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/me/codes/gitTest/hips/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

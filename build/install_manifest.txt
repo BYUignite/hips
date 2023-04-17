@@ -1,1 +1,1 @@
-/Users/me/codes/reactHips/hips/run/hips.x
+/Users/me/codes/gitTest/hips/run/hips.x

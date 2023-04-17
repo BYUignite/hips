@@ -1,8 +1,8 @@
-# Install script for directory: /Users/me/codes/reactHips/hips
+# Install script for directory: /Users/me/codes/gitTest/hips
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/Users/me/codes/reactHips/hips/installation")
+  set(CMAKE_INSTALL_PREFIX "/Users/me/codes/gitTest/hips/installation")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/me/codes/reactHips/hips/build/src/cmake_install.cmake")
+  include("/Users/me/codes/gitTest/hips/build/src/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/me/codes/reactHips/hips/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/me/codes/gitTest/hips/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

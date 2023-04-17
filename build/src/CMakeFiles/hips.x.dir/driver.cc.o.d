@@ -1,6 +1,6 @@
 src/CMakeFiles/hips.x.dir/driver.cc.o: \
-  /Users/me/codes/reactHips/hips/src/driver.cc \
-  /Users/me/codes/reactHips/hips/src/hips.h \
+  /Users/me/codes/gitTest/hips/src/driver.cc \
+  /Users/me/codes/gitTest/hips/src/hips.h \
   /usr/local/include/cantera/thermo.h \
   /usr/local/include/cantera/thermo/ThermoPhase.h \
   /usr/local/include/cantera/thermo/Phase.h \
@@ -728,7 +728,7 @@ src/CMakeFiles/hips.x.dir/driver.cc.o: \
   /usr/local/include/cantera/base/Solution.h \
   /usr/local/include/cantera/numerics/Integrator.h \
   /usr/local/include/cantera/numerics/FuncEval.h \
-  /Users/me/codes/reactHips/hips/src/cvodeDriver.h \
+  /Users/me/codes/gitTest/hips/src/cvodeDriver.h \
   /usr/local/include/cantera/kinetics.h \
   /usr/local/include/cantera/kinetics/Kinetics.h \
   /usr/local/include/cantera/kinetics/StoichManager.h \
@@ -946,8 +946,8 @@ src/CMakeFiles/hips.x.dir/driver.cc.o: \
   /usr/local/include/cantera/kinetics/BlowersMaselRate.h \
   /usr/local/include/cantera/kinetics/PlogRate.h \
   /usr/local/include/cantera/kinetics/KineticsFactory.h \
-  /Users/me/codes/reactHips/hips/src/randomGenerator.h \
-  /Users/me/codes/reactHips/hips/src/MersenneTwister.h \
+  /Users/me/codes/gitTest/hips/src/randomGenerator.h \
+  /Users/me/codes/gitTest/hips/src/MersenneTwister.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/fstream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/stack \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/iomanip

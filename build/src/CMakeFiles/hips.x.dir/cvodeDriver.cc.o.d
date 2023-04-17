@@ -1,5 +1,5 @@
 src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o: \
-  /Users/me/codes/reactHips/hips/src/cvodeDriver.cc \
+  /Users/me/codes/gitTest/hips/src/cvodeDriver.cc \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__config \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/pthread.h \
@@ -229,7 +229,7 @@ src/CMakeFiles/hips.x.dir/cvodeDriver.cc.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/bitset \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__bit_reference \
-  /Users/me/codes/reactHips/hips/src/cvodeDriver.h \
+  /Users/me/codes/gitTest/hips/src/cvodeDriver.h \
   /usr/local/include/cantera/thermo.h \
   /usr/local/include/cantera/thermo/ThermoPhase.h \
   /usr/local/include/cantera/thermo/Phase.h \

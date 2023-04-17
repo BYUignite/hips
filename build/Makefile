@@ -57,10 +57,10 @@ RM = /usr/local/Cellar/cmake/3.23.2/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/me/codes/reactHips/hips
+CMAKE_SOURCE_DIR = /Users/me/codes/gitTest/hips
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/me/codes/reactHips/hips/build
+CMAKE_BINARY_DIR = /Users/me/codes/gitTest/hips/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/reactHips/hips/build/CMakeFiles /Users/me/codes/reactHips/hips/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/gitTest/hips/build/CMakeFiles /Users/me/codes/gitTest/hips/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/reactHips/hips/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/me/codes/gitTest/hips/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
