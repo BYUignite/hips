@@ -17,7 +17,7 @@ batchReactor_cvode::batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSo
 
     nvar = gas->nSpecies();
 
-    vector<double> atol(nvar, 1E-12);
+    vector<double> atol(nvar, 1E-10);
     double         rtol = 1E-4;
 
     integrator = make_unique<integrator_cvode>(rhsf_cvode, this, nvar, rtol, atol);

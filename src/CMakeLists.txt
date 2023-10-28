@@ -2,9 +2,9 @@
 
 add_library(hips)
 
-target_sources(hips PRIVATE hips.cc                      hips.h 
-                            batchReactor_cvode.cc        batchReactor_cvode.h
-                            integrator_cvode.h
+target_sources(hips PRIVATE hips.cc                 hips.h 
+                            batchReactor_cvode.cc   batchReactor_cvode.h   integrator_cvode.h
+                            batchReactor_cantera.cc batchReactor_cantera.h
               )
 
 # option(USE_CUSTOM_INTEGRATOR "Use a custom integrator" OFF){{{
