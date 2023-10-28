@@ -1,16 +1,18 @@
 #include "hips.h"
 
 #include <iostream>
-#include <cmath>
 #include <iomanip>
-#include "randomGenerator.h"
 #include <fstream>
 #include <sstream>
+#include <cmath>
+
+#include "randomGenerator.h"
 
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 /** Constructor
+  * set seed to negative to randomize it
   */
 
 hips::hips(int     nLevels_, 
@@ -21,22 +23,20 @@ hips::hips(int     nLevels_,
            int     nVar_,
            vector<double> &ScHips_,
            shared_ptr<Cantera::Solution> cantSol,
-           Integrator*  customIntegrator,
-           bool   performReaction ) : 
-    nLevels(nLevels_), domainLength(domainLength_), tau0(tau0_),
-    C_param(C_param_), forceTurb(forceTurb_),       ScHips(ScHips_),   
-    nVar(nVar_),       LrandSet(true),              cvodeD(cantSol), performReaction(performReaction) { 
+           bool   performReaction_,
+           int    seed) : 
+    nLevels(nLevels_),                 domainLength(domainLength_), tau0(tau0_),
+    C_param(C_param_),                 forceTurb(forceTurb_),       ScHips(ScHips_),   
+    nVar(nVar_),                       LrandSet(true),              rand(seed),
+    performReaction(performReaction_) { 
     
-    if (customIntegrator) {
-        integrator = std::unique_ptr<Integrator>(customIntegrator);
-    } else {
-        integrator = std::make_unique<cvodeDriver>(cantSol);
-    }
-
-    varData = vector<vector<double> * > (nVar);                  // or varData.resize(nVar)
    
     gas = cantSol->thermo(); 
-    nsp = gas->nSpecies();                                           // read the size of species
+    nsp = gas->nSpecies();
+
+    varData.resize(nVar);
+
+    bRxr = make_unique<batchReactor_cvode>(cantSol);
 
     //-------------------------- Set number of parcels, level lengthscales, timescales, and rates, and i_plus && i_batchelor
      
@@ -110,9 +110,6 @@ hips::hips(int     nLevels_,
     for (int i=0; i<nparcels; i++)
         pLoc[i] = i;
     
-    //-------------------------------------
-
-    rand = new randomGenerator(seed);
 } 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,7 +146,7 @@ void hips::calculateSolution(const double tRun) {
 
         nEddies++;
 
-        //if(nEddies %1000000ull == 0) writeData(++fileCounter, time);
+        if(nEddies %100000ull == 0) writeData(++fileCounter, time);
     }
     time = tRun;
     iLevel = 0; iTree  = 0;
@@ -172,22 +169,22 @@ void hips::sample_hips_eddy(double &dtEE, int &iLevel) {
 
     //--------------- time to next eddy
 
-    double r = rand->getRand();
+    double r = rand.getRand();
     dtEE = -log(r)/eddyRate_total;
 
     //----------------- get eddy level
 
-    r = rand->getRand();
+    r = rand.getRand();
 
     if ( r <= eddyRate_inertial/eddyRate_total) {     // inertial region
-        r = rand->getRand();
+        r = rand.getRand();
         iLevel = ceil(3.0/5.0*log2(1.0-r*c1) - 1.0);
         if (iLevel < 0)    iLevel = 0;
         if (iLevel > iEta) iLevel = iEta;
     }
 
     else {                                            // "Batchelor" region
-        r = rand->getRand();
+        r = rand.getRand();
         iLevel = ceil(log2(r*c2 + c3) - 1.0);
         if(iLevel < iEta+1) iLevel = iEta+1;
         if(iLevel > Nm3) iLevel = Nm3;
@@ -248,9 +245,9 @@ void hips::sample_hips_eddy(double &dtEE, int &iLevel) {
 
 void hips::selectAndSwapTwoSubtrees(const int iLevel, int &iTree) {
 
-    iTree = rand->getRandInt((1 << iLevel)-1);
-    int zero_q = rand->getRandInt(1);                                    // 0q where q is 0 or 1
-    int one_r  = 2 + rand->getRandInt(1);                                // 1r where r is 0 or 1
+    iTree = rand.getRandInt((1 << iLevel)-1);
+    int zero_q = rand.getRandInt(1);                                    // 0q where q is 0 or 1
+    int one_r  = 2 + rand.getRandInt(1);                                // 1r where r is 0 or 1
 
     int Qstart = (zero_q << (Nm3-iLevel)) + (iTree << (Nm1-iLevel));     // starting index of Q parcels
     int Rstart = (one_r  << (Nm3-iLevel)) + (iTree << (Nm1-iLevel));     // starting index of R parcels
@@ -280,7 +277,7 @@ void hips::advanceHips(const int iLevel, const int iTree) {
     bool rxnDone = false;                       // react all variables once
     for (int k=0; k<nVar; k++) {                //   upon finding first variable needing micromixing
         if ( (iLevel >= i_plus[k]) || 
-             (iLevel==i_plus[k]-1 && rand->getRand() <= i_plus[k]-i_batchelor[k]) ) {
+             (iLevel==i_plus[k]-1 && rand.getRand() <= i_plus[k]-i_batchelor[k]) ) {
                 if(!rxnDone && performReaction) {
                    reactParcels_LevelTree(iLevel, iTree);
                    rxnDone = true;
@@ -307,17 +304,22 @@ void hips::reactParcels_LevelTree(const int iLevel, const int iTree) {
     int iend = istart + nP;
     int ime;
     double dt;
+    double h;
+    vector<double> y(nsp);
 
     for (int i=istart; i<iend; i++) {
         ime = pLoc[i];
 
-        setState(ime);
         dt = time-parcelTimes[ime];
-        integrator->integrate(dt);
-
-        varData[0][0][ime] = gas->enthalpy_mass();
+        h = varData[0][0][ime]; 
         for (int k=0; k<nsp; k++)
-            varData[k+1][0][ime] = gas->massFraction(k);
+            y[k] = varData[k+1][0][ime];
+
+        bRxr->react(h, y, dt);
+
+        varData[0][0][ime] = h;
+        for (int k=0; k<nsp; k++)
+            varData[k+1][0][ime] = y[k];
     }
 
 }
@@ -458,24 +460,6 @@ void hips::writeData(const int ifile, const double outputTime) {
     }
 
     ofile.close();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/** Set the Cantera gas state.
-  * @param ipt \input parcel to set the state for.
-  */
-
-void hips::setState(const int &ipt){
-
-    vector<double> yi(nsp);
-    double h = varData[0][0][ipt]; 
-
-    for (int k=0; k<nsp; k++)
-        yi[k] = varData[k+1][0][ipt];
-
-    gas->setMassFractions(&yi[0]);
-    gas->setState_HP(h, gas->pressure());
-    
 }
 
 ///////////////////////////////////////////////////////////////////////////////

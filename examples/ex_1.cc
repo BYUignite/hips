@@ -17,6 +17,7 @@ using namespace std;
  * @param numParcels The number of parcels.
  * @return A vector containing initialized mixing fractions.
  */
+
 vector<double> initializeMixingFractions(int numParcels) {
     vector<double> mixingFractions;
     for (int i = 0; i < numParcels; i++) {
@@ -26,9 +27,13 @@ vector<double> initializeMixingFractions(int numParcels) {
     return mixingFractions;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 int main() {
-    // HiPS tree and constructor parameters
-    int numLevels = 16;
+
+    //---------- HiPS tree and constructor parameters
+
+    int numLevels = 12;
     double domainLength = 1.0;
     double tau0 = 1.0;
     double C_param = 0.5;
@@ -36,23 +41,29 @@ int main() {
     int forceTurb = 2;
     vector<double> ScHips(1, 1);
 
-    // Gas solution setup
+    //---------- Gas solution setup
+
     auto cantSol = Cantera::newSolution("gri30.yaml");
     auto gas = cantSol->thermo();
     size_t numSpecies = gas->nSpecies();
     int numVariables = 1;  
 
-    // HiPS tree creation
-    hips HiPS(numLevels, domainLength, tau0, C_param, forceTurb, numVariables, ScHips, cantSol, nullptr,false);
+    //---------- HiPS tree creation
+
+    hips HiPS(numLevels, domainLength, tau0, C_param, forceTurb, numVariables, ScHips, 
+              cantSol, false);
     int numParcels = HiPS.nparcels;
 
-    // Initialize mixing fractions
+    //---------- Initialize mixing fractions
+
     vector<double> initialMixingFractions = initializeMixingFractions(numParcels);
 
-    // Set state vectors in each parcel with initial mixing fractions
+    //---------- Set state vectors in each parcel with initial mixing fractions
+
     HiPS.set_varData(initialMixingFractions, 0);
 
-    // Advance HiPS for mixing 
+    //---------- Advance HiPS for mixing 
+
     HiPS.calculateSolution(tRun);
 
     return 0;

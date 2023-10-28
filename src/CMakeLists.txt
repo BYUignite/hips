@@ -2,17 +2,20 @@
 
 add_library(hips)
 
-target_sources(hips PRIVATE hips.cc hips.h)
+target_sources(hips PRIVATE hips.cc                      hips.h 
+                            batchReactor_cvode.cc        batchReactor_cvode.h
+                            integrator_cvode.h
+              )
 
-option(USE_CUSTOM_INTEGRATOR "Use a custom integrator" OFF)
-set(CUSTOM_INTEGRATOR_PATH "" CACHE STRING "Path to custom integrator library")
+# option(USE_CUSTOM_INTEGRATOR "Use a custom integrator" OFF){{{
+# set(CUSTOM_INTEGRATOR_PATH "" CACHE STRING "Path to custom integrator library")
 
-if(USE_CUSTOM_INTEGRATOR)
-    target_sources(hips PRIVATE ${CUSTOM_INTEGRATOR_PATH}/customIntegrator.cc)
-    target_include_directories(hips PRIVATE ${CUSTOM_INTEGRATOR_PATH})
-else()
-    target_sources(hips PRIVATE cvodeDriver.cc cvodeDriver.h)
-endif()
+# if(USE_CUSTOM_INTEGRATOR)
+#     target_sources(hips PRIVATE ${CUSTOM_INTEGRATOR_PATH}/customIntegrator.cc)
+#     target_include_directories(hips PRIVATE ${CUSTOM_INTEGRATOR_PATH})
+# else()
+#     target_sources(hips PRIVATE cvodeDriver.cc cvodeDriver.h)
+# endif()}}}
 
 #----------
 

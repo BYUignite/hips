@@ -1,18 +1,14 @@
-#ifndef  HIPS_H
-#define  HIPS_H
+#pragma once
 
-#include "cantera/thermo.h"
 #include "cantera/base/Solution.h"
-#include "cantera/numerics/Integrator.h"
-#include "cvodeDriver.h"
+#include "cantera/thermo.h"
 
 #include <iostream>
 #include <vector>
 #include <string>
-#include <map>
 
-//#include "state.h"
 #include "randomGenerator.h"
+#include "batchReactor_cvode.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,13 +20,10 @@ class hips {
 
     public:
 
-        int                                   nparcels; ///< number of parcels
-        std::vector<std::vector<double > * >  varData;  ///< vector of pointers to vector
-        std::shared_ptr<Cantera::ThermoPhase> gas;
-        std::unique_ptr<Integrator> integrator;
-
-
-
+        int                                    nparcels; ///< number of parcels
+        std::vector<std::vector<double > * >   varData;  ///< vector of pointers to vector
+        std::shared_ptr<Cantera::ThermoPhase>  gas;      ///< cantera thermo object
+        std::unique_ptr<batchReactor_cvode>    bRxr;     ///< chemistry integrator (constant pressure)
 
     private:
 
@@ -57,13 +50,11 @@ class hips {
         std::vector<double> levelRates;          ///< list of eddy event rates at each level
         std::vector<int>    pLoc;                ///< parcel index array for fast implementation of swaps
         std::vector<double> ScHips; 
-        cvodeDriver         cvodeD;     
 
         bool                performReaction; 
         bool                LrandSet;            ///< flag indicating new randomGen  --> allow deletion
-        randomGenerator     *rand;
+        randomGenerator     rand;
 
-        const  int          seed = 30;           ///<  random number generator seed (negative to randomize it)
         const double        Afac = 0.5;          ///< level lengthscale reduction factor (0.5) 
                
   /////////////////////////////// MEMBER FUNCTIONS//////////////////////////////////////////
@@ -78,10 +69,10 @@ class hips {
              int             nVar_,
              std::vector<double> &ScHips_,
              std::shared_ptr<Cantera::Solution> cantSol,
-             Integrator*     customIntegrator,
-             bool            performReaction);
+             bool            performReaction,
+             int             seed = -10);
 
-        virtual ~hips() { if(LrandSet) delete rand; }
+        virtual ~hips() {}
 
         void calculateSolution(const double tRun);                            // Solution for hips
         void set_varData(std::vector<double> &v, int i) { varData[i] = &v; }  // passing all variables to vector of pointer     
@@ -96,9 +87,6 @@ class hips {
         void mixAcrossLevelTree( int kVar, const int iMixLevel, const int iTree);                       // const int iTree=-1);
         void forceProfile();
         void writeData(const int ifile, const double outputTime);
-
-        void setState(const int &ipt);     // setting gas state in each parcel
 };
-#endif
 
 
