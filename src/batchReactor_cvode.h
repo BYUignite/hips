@@ -1,5 +1,6 @@
 #pragma once
 
+#include "batchReactor.h"
 #include "cantera/base/Solution.h"
 #include "cantera/thermo.h"
 #include "cantera/kinetics.h"
@@ -10,20 +11,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class batchReactor_cvode {
+class batchReactor_cvode : public batchReactor {
 
 ////////////////////////////// DATA MEMBERS /////////////////////////////
-
-private:
-
-    std::shared_ptr<Cantera::ThermoPhase> gas;        ///< Cantera thermo object
-    std::shared_ptr<Cantera::Kinetics>    kin;        ///< Cantera kinetics object
+    
     std::unique_ptr<integrator_cvode>     integrator; ///< cvode integrator wrappter
-
-    int                                   nvar;       ///< number of variables/equations solved
-
-    double                                h_fixed;    ///< adiabatic h during integrate
-    double                                P_fixed;    ///< pressure during integrate
 
 /////////////////////////////// MEMBER FUNCTIONS//////////////////////////////////////////
 
@@ -31,10 +23,9 @@ public:
 
     batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSol);
 
-    void react(double &h, std::vector<double> &y, const double tRun);
+    virtual void react(double &h, std::vector<double> &y, const double tRun);
 
     int rhsf(const double t, const double *vars, double *dvarsdt);  // dydt = rhsf
 
     virtual ~batchReactor_cvode() {}
-
 };

@@ -1,11 +1,10 @@
+#include "hips.h"
+#include "cantera/base/Solution.h"
+#include "cantera/thermo.h"
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "hips.h"
-#include "cantera/thermo.h"
-#include "cantera/base/Solution.h"
-#include "cantera/numerics/Integrator.h"
 #include <cmath>
 
 using namespace std;

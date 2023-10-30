@@ -1,8 +1,6 @@
 #include "hips.h"
-
-#include "cantera/thermo.h"
 #include "cantera/base/Solution.h"
-#include "cantera/numerics/Integrator.h"
+#include "cantera/thermo.h"
 
 #include <vector>
 #include <string>

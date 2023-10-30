@@ -8,8 +8,7 @@
 #include <string>
 
 #include "randomGenerator.h"
-//#include "batchReactor_cvode.h"
-#include "batchReactor_cantera.h"
+#include "batchReactor.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,8 +23,7 @@ class hips {
         int                                    nparcels; ///< number of parcels
         std::vector<std::vector<double > * >   varData;  ///< vector of pointers to vector
         std::shared_ptr<Cantera::ThermoPhase>  gas;      ///< cantera thermo object
-        //std::unique_ptr<batchReactor_cvode>    bRxr;     ///< chemistry integrator (constant pressure)
-        std::unique_ptr<batchReactor_cantera>  bRxr;     ///< chemistry integrator (constant pressure)
+        std::unique_ptr<batchReactor>          bRxr;     ///< chemistry integrator (constant pressure)
 
     private:
 

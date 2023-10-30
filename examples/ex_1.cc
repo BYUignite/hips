@@ -1,8 +1,7 @@
 
-#include "hips.h" // Include the HiPS library header
-#include "cantera/thermo.h"
+#include "hips.h"
 #include "cantera/base/Solution.h"
-#include "cantera/numerics/Integrator.h"
+#include "cantera/thermo.h"
 #include <vector>
 #include <string>
 #include <iostream>

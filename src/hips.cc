@@ -1,12 +1,13 @@
 #include "hips.h"
+#include "batchReactor_cvode.h"
+#include "batchReactor_cantera.h"
+#include "randomGenerator.h"
 
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <cmath>
-
-#include "randomGenerator.h"
 
 using namespace std;
 
@@ -36,8 +37,8 @@ hips::hips(int     nLevels_,
 
     varData.resize(nVar);
 
-    //bRxr = make_unique<batchReactor_cvode>(cantSol);
-    bRxr = make_unique<batchReactor_cantera>(cantSol);
+    bRxr = make_unique<batchReactor_cvode>(cantSol);
+    //bRxr = make_unique<batchReactor_cantera>(cantSol);
 
     //-------------------------- Set number of parcels, level lengthscales, timescales, and rates, and i_plus && i_batchelor
      
