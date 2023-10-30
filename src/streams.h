@@ -1,15 +1,10 @@
-/**
- * @file streams.h
- * Header file for classes \ref streams
- */
-
 #pragma once
 
+#include "cantera/base/Solution.h"
+#include "cantera/thermo.h"
+
 #include <vector>
-
-using namespace std;
-
-class domain;
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -29,50 +24,41 @@ class streams {
 
     //////////////////// DATA MEMBERS //////////////////////
 
-        domain         *domn;           ///< pointer to domain object
+        double              h0;              ///< stream mixf=0 enthalpy (J/kg)
+        double              h1;              ///< stream mixf=1 enthalpy (J/kg)
+        std::vector<double> y0;              ///< stream mixf=0 composition vector
+        std::vector<double> y1;              ///< stream mixf=1 composition vector
 
-        double         T0;              ///< stream mixf=0 temperature
-        double         T1;              ///< stream mixf=1 temperature
-        double         h0;              ///< stream mixf=0 enthalpy
-        double         h1;              ///< stream mixf=1 enthalpy
-        vector<double> y0;              ///< stream mixf=0 composition vector
-        vector<double> y1;              ///< stream mixf=1 composition vector
-        double         M0;              ///< stream mixf=0 mean molecular weight
-        double         M1;              ///< stream mixf=1 mean molecular weight
-        double         rho0;            ///< stream mixf=0 density
-        double         rho1;            ///< stream mixf=1 density
-        vector<double> D0;              ///< stream mixf=0 diffusivities 
-        vector<double> D1;              ///< stream mixf=1 diffusivities
-        vector<double> hsp0;            ///< stream mixf=0 species enthalpies
-        vector<double> hsp1;            ///< stream mixf=1 species enthalpies
+        double P;
 
-        double         mixfStoic;       ///< stoichiometric mixture fraction
+        std::shared_ptr<Cantera::ThermoPhase> gas;
 
-        int            nspc;            ///< number of species in gas mechanism
+        double mixfStoic;       ///< stoichiometric mixture fraction
+        int    nspc;            ///< number of species in gas mechanism
+        double beta0;           ///< mixf = (beta-beta0) / (beta1-beta0)
+        double beta1;           ///< mixf = (beta-beta0) / (beta1-beta0)
 
-                                        /// \fun{\text{mixf} = \frac{\beta-\beta_0}{\beta_1-\beta_0}}
-        double         beta0;           ///< mixf = (beta-beta0) / (beta1-beta0)
-                                        ///< \fun{\text{mixf} = \frac{\beta-\beta_0}{\beta_1-\beta_0}}
-        double         beta1;           ///< mixf = (beta-beta0) / (beta1-beta0)
-
-        vector<double> gCHON;           ///< gammas, as in beta = sum_i (y_i*gamma_i)
-
-        int            comp2;           ///< for premixed combustion to distinguish between different input possibilities for the mixture
+        std::vector<double> gCHON;           ///< gammas, as in beta = sum_i (y_i*gamma_i)
 
     //////////////////// MEMBER FUNCTIONS /////////////////
 
         void getProdOfCompleteComb(const double mixf,
-                                   vector<double> &ypcc,
+                                   std::vector<double> &ypcc,
                                    double &hpcc,
                                    double &Tpcc);
 
         void getEquilibrium_HP(const double mixf,
-                                     vector<double> &yeq,
+                                     std::vector<double> &yeq,
                                      double &heq,
                                      double &Teq);
 
+        void getEquilibrium_TP(const double mixf,
+                                     double Teq,
+                                     std::vector<double> &yeq,
+                                     double &heq);
+
         void getMixingState(const double mixf,
-                            vector<double> &ymix,
+                            std::vector<double> &ymix,
                             double &hmix,
                             double &Tmix);
 
@@ -82,9 +68,9 @@ class streams {
     private:
 
         void setStoicMixf();
-        vector<double> setElementMassFracs(const double *y);
-        vector<double> setElementMoleFracs(const double *y);
-        vector<double> getElementMoles(const double *x,
+        std::vector<double> setElementMassFracs(const double *y);
+        std::vector<double> setElementMoleFracs(const double *y);
+        std::vector<double> getElementMoles(const double *x,
                                        double &nOnotFromO2,
                                        double &nHnotFromH2O,
                                        double &nCnotFromCO2);
@@ -93,13 +79,15 @@ class streams {
 
     public:
 
-        streams(){}
-        void init(domain *p_domn, const vector<double> &gammas);
+        streams() {}
+        streams(std::shared_ptr<Cantera::Solution> csol,
+                const double _P,
+                const double _h0, 
+                const double _h1,
+                const std::vector<double> &_y0, 
+                const std::vector<double> &_y1);
 
         ~streams(){}
-
-
-
 
 };
 

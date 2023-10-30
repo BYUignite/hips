@@ -1,100 +1,43 @@
-/**
- * @file streams.cc
- * Header file for class \ref streams
- */
-
 #include "streams.h"
-#include "domain.h"
-#include "yaml-cpp/yaml.h"
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-/** Initialize
- *
- * @param p_domn \input pointer to domain object.
+/** Constructor
  */
-void streams::init(domain *p_domn, const vector<double> &gammas) {
 
-    domn = p_domn;
+streams::streams(shared_ptr<Cantera::Solution> csol,
+                 const double _P, 
+                 const double _h0, 
+                 const double _h1,
+                 const vector<double> &_y0, 
+                 const vector<double> &_y1) :
+    P(_P),
+    h0(_h0),
+    h1(_h1),
+    y0(_y0),
+    y1(_y1) {
 
-    nspc = domn->gas->nSpecies();
+    //----------
 
-    T0   = domn->io->streamProps["T0"].as<double>();
-    T1   = domn->io->streamProps["T1"].as<double>();
+    gas  = csol->thermo(); 
+    nspc = gas->nSpecies();
 
-    y0   = vector<double>(nspc, 0.0);
-    y1   = vector<double>(nspc, 0.0);
+    gCHON.resize(4);
+    gCHON[0] =  2.0/gas->atomicWeight(gas->elementIndex("C"));
+    gCHON[1] =  0.5/gas->atomicWeight(gas->elementIndex("H"));
+    gCHON[2] = -1.0/gas->atomicWeight(gas->elementIndex("O"));
+    gCHON[3] = 0.0;
 
-    D0   = vector<double>(nspc, 0.0);
-    D1   = vector<double>(nspc, 0.0);
-
-    hsp0   = vector<double>(nspc, 0.0);
-    hsp1   = vector<double>(nspc, 0.0);
-
-    bool Lmole = domn->io->streamProps["moleOrMass"].as<string>() == "MOLE" ? true : false;
-
-    gCHON = gammas;
-
-    //--------------- stream properties: T,h,y.
-
-    double sum = 0.0;              // for normalizing
-    vector<string> y0Labels;       // species names in list
-    vector<double> y0short;        // value corresponding to y0Labels
-    YAML::Node yy = domn->io->streamProps["comp0"];
-    for(YAML::const_iterator it = yy.begin(); it!=yy.end(); it++) {
-        y0Labels.push_back(it->first.as<string>());
-        y0short.push_back(it->second.as<double>());
-        sum += it->second.as<double>();
-    }
-    for(int i=0; i<y0Labels.size(); i++)
-        y0[domn->gas->speciesIndex(y0Labels[i])] = y0short[i]/sum;
-
-    sum = 0.0;
-    vector<string> y1Labels;       // species names in list
-    vector<double> y1short;        // value corresponding to y0Labels
-    yy = domn->io->streamProps["comp1"];
-    for(YAML::const_iterator it = yy.begin(); it!=yy.end(); it++) {
-        y1Labels.push_back(it->first.as<string>());
-        y1short.push_back(it->second.as<double>());
-        sum += it->second.as<double>();
-    }
-    for(int i=0; i<y1Labels.size(); i++)
-        y1[domn->gas->speciesIndex(y1Labels[i])] = y1short[i] / sum;
-
-    if(Lmole) {
-        domn->gas->setMoleFractions( &y0[0] );
-        domn->gas->getMassFractions( &y0[0] );
-        domn->gas->setMoleFractions( &y1[0] );
-        domn->gas->getMassFractions( &y1[0] );
-    }
-
-    domn->gas->setState_TPY( T0, domn->pram->pres, &y0[0] );
-    h0   = domn->gas->enthalpy_mass();
-    rho0 = domn->gas->density();
-    M0   = domn->gas->meanMolecularWeight();
-    domn->tran->getMixDiffCoeffs(&D0[0]);
-    domn->gas->getEnthalpy_RT(&hsp0[0]);               // non-dimensional enthalpy
-    for (int k=0; k<nspc; k++)
-        hsp0[k] = hsp0[k] * T0 * GasConstant / domn->gas->molecularWeight(k);    // J/kg
-
-    domn->gas->setState_TPY( T1, domn->pram->pres, &y1[0] );
-    h1   = domn->gas->enthalpy_mass();
-    rho1 = domn->gas->density();
-    M1   = domn->gas->meanMolecularWeight();
-    domn->tran->getMixDiffCoeffs(&D1[0]);
-    domn->gas->getEnthalpy_RT(&hsp1[0]);               // non-dimensional enthalpy
-    for (int k=0; k<nspc; k++)
-        hsp1[k] = hsp1[k] * T1 * GasConstant / domn->gas->molecularWeight(k);    // J/kg
-
-    //---------------- stoich mixf
+    //----------------
 
     setStoicMixf();
 
     getMixtureFraction(&y0[0], true);    // set beta0 and beta1
-
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 /** Computes the temperature, enthalpy, and composition of mixing among streams.
  *
@@ -103,17 +46,18 @@ void streams::init(domain *p_domn, const vector<double> &gammas) {
  *  @param hmix \output enthalpy of products of complete combustion.
  *  @param Tmix \output temperature of products of complete combustion.
  */
+
 void streams::getMixingState(const double mixf, vector<double> &ymix,
-                             double &hmix, double &Tmix){
+                             double &hmix, double &Tmix) {
 
     hmix = h1*mixf + h0*(1.0-mixf);
     for(int k=0; k<nspc; k++)
         ymix[k] = y1[k]*mixf + y0[k]*(1.0-mixf);
 
-    domn->gas->setMassFractions( &ymix[0] );
-    domn->gas->setState_HP(hmix, domn->pram->pres, 1.E-10);    // get temperature as Tadiabatic
+    gas->setMassFractions( &ymix[0] );
+    gas->setState_HP(hmix, P, 1.E-10);    // get temperature as Tadiabatic
 
-    Tmix = domn->gas->temperature();
+    Tmix = gas->temperature();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,8 +68,9 @@ void streams::getMixingState(const double mixf, vector<double> &ymix,
  *  @param heq \output enthalpy
  *  @param Teq \output temperature
  */
+
 void streams::getEquilibrium_HP(const double mixf, vector<double> &yeq,
-                                      double &heq, double &Teq){
+                                      double &heq, double &Teq) {
 
     //---------- Compute the mixing mass fractions and enthalpy
 
@@ -134,13 +79,40 @@ void streams::getEquilibrium_HP(const double mixf, vector<double> &yeq,
         yeq[k] = y1[k]*mixf + y0[k]*(1.0-mixf);
     heq = h1*mixf + h0*(1.0-mixf);
 
-    domn->gas->setState_PY(domn->pram->pres, &yeq[0]);
-    domn->gas->setState_HP(heq, domn->pram->pres, 1.E-10);
+    gas->setState_PY(P, &yeq[0]);
+    gas->setState_HP(heq, P, 1.E-10);
 
-    domn->gas->equilibrate("HP");
-    domn->gas->getMassFractions(&yeq[0]);
+    gas->equilibrate("HP");
+    gas->getMassFractions(&yeq[0]);
 
-    Teq = domn->gas->temperature();
+    Teq = gas->temperature();
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/** Computes the enthalpy, and composition of equilibrium at the given mixf for given T
+ *
+ *  @param mixf \input mixture fraction, defines elemental composition.
+ *  @param Teq \input temperature
+ *  @param yeq \output mass fractions
+ *  @param heq \output enthalpy
+ */
+
+void streams::getEquilibrium_TP(const double mixf, double Teq, 
+                                      vector<double> &yeq, double &heq ) {
+
+    //---------- Compute the mixing mass fractions and enthalpy
+
+    yeq.resize(nspc);
+    for(int k=0; k<nspc; k++)
+        yeq[k] = y1[k]*mixf + y0[k]*(1.0-mixf);
+
+    gas->setState_TPY(Teq, P, &yeq[0]);
+
+    gas->equilibrate("TP");
+    gas->getMassFractions(&yeq[0]);
+
+    heq = gas->enthalpy_mass();
 
 }
 
@@ -153,8 +125,9 @@ void streams::getEquilibrium_HP(const double mixf, vector<double> &yeq,
  *  @param hpcc \output enthalpy of products of complete combustion.
  *  @param Tpcc \output temperature of products of complete combustion.
  */
+
 void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
-                                    double &hpcc, double &Tpcc){
+                                    double &hpcc, double &Tpcc) {
 
     //---------- Compute the mixing mass fractions and enthalpy
 
@@ -167,14 +140,13 @@ void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
 
     //--------- Set gas and element indicicies
 
-    int iC = domn->gas->elementIndex("C");
-    int iH = domn->gas->elementIndex("H");
-    //int iO = domn->gas->elementIndex("O"); // !!!!!  currently unusedvariable
-    int iN = domn->gas->elementIndex("N");
-    int iCO2 = domn->gas->speciesIndex("CO2");
-    int iH2O = domn->gas->speciesIndex("H2O");
-    int iN2  = domn->gas->speciesIndex("N2");
-    int iO2  = domn->gas->speciesIndex("O2");
+    int iC = gas->elementIndex("C");
+    int iH = gas->elementIndex("H");
+    int iN = gas->elementIndex("N");
+    int iCO2 = gas->speciesIndex("CO2");
+    int iH2O = gas->speciesIndex("H2O");
+    int iN2  = gas->speciesIndex("N2");
+    int iO2  = gas->speciesIndex("O2");
 
     //---------- Set ypcc as the mixing mole fractions: Take a basis of one mole:
     // now we are working in moles
@@ -185,8 +157,8 @@ void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
     // CxHyNz   + (beta)O2   ==>  (z/2)N2 + (x)CO2 + (y/2)H2O
     // Note this allows fuels with nitrogen and oxygen
 
-    domn->gas->setMassFractions( &ypcc[0] );
-    domn->gas->getMoleFractions( &ypcc[0] );
+    gas->setMassFractions( &ypcc[0] );
+    gas->getMoleFractions( &ypcc[0] );
 
     double nOnotFromO2  = 0.0;
     double nHnotFromH2O = 0.0;
@@ -197,7 +169,7 @@ void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
     double x    = elemM[iC];
     double y    = elemM[iH];
     double z    = elemM[iN];
-    double beta = elemM[domn->gas->elementIndex("O")] * 0.5;        // moles of O as O2
+    double beta = elemM[gas->elementIndex("O")] * 0.5;        // moles of O as O2
 
     //--------------------------------------------------------------------------
 
@@ -218,7 +190,7 @@ void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
         //double eta = beta/(x+y/4.0); // extent of reaction
         double eta = (beta-nOnotFromO2/2)/(x+y/4-nOnotFromO2/2); // extent of reaction
         if(eta > 1.0)
-            *domn->io->ostrm << endl << "eta > 1.0" << endl;
+            cout << endl << "eta > 1.0" << endl;
         d1 = 1.0-eta;                            // fraction of fuel unburnt
 
         for(int k=0; k<nspc; k++)
@@ -239,15 +211,15 @@ void streams::getProdOfCompleteComb(const double mixf, vector<double> &ypcc,
     assert(sum != 0.0);
     for(int k=0; k<nspc; k++)
         ypcc[k] /= sum;
-    domn->gas->setMoleFractions( &ypcc[0] );      // set mole fractions
-    domn->gas->getMassFractions( &ypcc[0] );      // set ypcc as mass fractions
+    gas->setMoleFractions( &ypcc[0] );      // set mole fractions
+    gas->getMassFractions( &ypcc[0] );      // set ypcc as mass fractions
 
 
     //--------------------------------------------------------------------------
 
-    domn->gas->setState_HP(hpcc, domn->pram->pres, 1.E-10);    // get temperature as Tadiabatic
-    //domn->gas->setState_HP(hpcc, domn->pram->pres);    // get temperature as Tadiabatic
-    Tpcc = domn->gas->temperature();
+    gas->setState_HP(hpcc, P, 1.E-10);    // get temperature as Tadiabatic
+    //gas->setState_HP(hpcc, P);    // get temperature as Tadiabatic
+    Tpcc = gas->temperature();
 
 }
 
@@ -263,23 +235,23 @@ void streams::setStoicMixf() {
     vector<double> elemMassFrac0 = setElementMassFracs(&y0[0]);
     vector<double> elemMassFrac1 = setElementMassFracs(&y1[0]);
 
-    mc0 = elemMassFrac0[domn->gas->elementIndex("C")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("C"));
-    mc1 = elemMassFrac1[domn->gas->elementIndex("C")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("C"));
-    mh0 = elemMassFrac0[domn->gas->elementIndex("H")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("H"));
-    mh1 = elemMassFrac1[domn->gas->elementIndex("H")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("H"));
-    mo0 = elemMassFrac0[domn->gas->elementIndex("O")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("O"));
-    mo1 = elemMassFrac1[domn->gas->elementIndex("O")]/
-        domn->gas->atomicWeight(domn->gas->elementIndex("O"));
+    mc0 = elemMassFrac0[gas->elementIndex("C")]/
+        gas->atomicWeight(gas->elementIndex("C"));
+    mc1 = elemMassFrac1[gas->elementIndex("C")]/
+        gas->atomicWeight(gas->elementIndex("C"));
+    mh0 = elemMassFrac0[gas->elementIndex("H")]/
+        gas->atomicWeight(gas->elementIndex("H"));
+    mh1 = elemMassFrac1[gas->elementIndex("H")]/
+        gas->atomicWeight(gas->elementIndex("H"));
+    mo0 = elemMassFrac0[gas->elementIndex("O")]/
+        gas->atomicWeight(gas->elementIndex("O"));
+    mo1 = elemMassFrac1[gas->elementIndex("O")]/
+        gas->atomicWeight(gas->elementIndex("O"));
 
     mixfStoic = (2.0*mc0 + 0.5*mh0 - mo0) /
         (mo1-mo0 + 2.0*(mc0-mc1) + 0.5*(mh0-mh1));
 
-    *domn->io->ostrm << endl << "# mixfStoic = m_fuel/(m_fuel+m_air) = " << mixfStoic << endl;
+    cout << endl << "# mixfStoic = m_fuel/(m_fuel+m_air) = " << mixfStoic << endl;
 
 }
 
@@ -292,19 +264,19 @@ void streams::setStoicMixf() {
 vector<double> streams::setElementMassFracs(const double *y) {
 
 
-    vector<double> atomArr(domn->gas->nElements());
-    vector<double> elemMassFrac(domn->gas->nElements(), 0.0);
+    vector<double> atomArr(gas->nElements());
+    vector<double> elemMassFrac(gas->nElements(), 0.0);
     double sum = 0.0;
 
-    domn->gas->setMassFractions( &y[0] );
+    gas->setMassFractions( &y[0] );
 
     for(int k=0; k<nspc; k++) {
         sum=0.0;
-        domn->gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
+        gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
         for(int m=0; m<(int)atomArr.size(); m++)
-            sum += atomArr[m] * domn->gas->atomicWeight(m);
+            sum += atomArr[m] * gas->atomicWeight(m);
         for(int m=0; m<(int)atomArr.size(); m++)
-            elemMassFrac[m] += y[k] * atomArr[m]/sum * domn->gas->atomicWeight(m);
+            elemMassFrac[m] += y[k] * atomArr[m]/sum * gas->atomicWeight(m);
                               // is * mass frac of elem in sp
     }
 
@@ -321,15 +293,15 @@ vector<double> streams::setElementMassFracs(const double *y) {
 vector<double> streams::setElementMoleFracs(const double *y) {
 
 
-    vector<double> atomArr(domn->gas->nElements());
-    vector<double> elemMoleFrac(domn->gas->nElements(), 0.0);
+    vector<double> atomArr(gas->nElements());
+    vector<double> elemMoleFrac(gas->nElements(), 0.0);
 
-    domn->gas->setMassFractions( &y[0] );
+    gas->setMassFractions( &y[0] );
 
     for(int k=0; k<nspc; k++) {
-        domn->gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
+        gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
         for(int m=0; m<(int)atomArr.size(); m++)
-            elemMoleFrac[m] += domn->gas->moleFraction(k) * atomArr[m];
+            elemMoleFrac[m] += gas->moleFraction(k) * atomArr[m];
     }
     double sum = 0.0;
     for(int m=0; m<(int)atomArr.size(); m++)
@@ -357,17 +329,17 @@ vector<double> streams::getElementMoles(const double *x,
                                         double &nCnotFromCO2) {
 
 
-    vector<double> atomArr(domn->gas->nElements());
-    vector<double> elemM(domn->gas->nElements(), 0.0);
-    int iO2  = domn->gas->speciesIndex("O2");
-    int iO   = domn->gas->elementIndex("O");
-    int iCO2 = domn->gas->speciesIndex("CO2");
-    int iC   = domn->gas->elementIndex("C");
-    int iH2O = domn->gas->speciesIndex("H2O");
-    int iH   = domn->gas->elementIndex("H");
+    vector<double> atomArr(gas->nElements());
+    vector<double> elemM(gas->nElements(), 0.0);
+    int iO2  = gas->speciesIndex("O2");
+    int iO   = gas->elementIndex("O");
+    int iCO2 = gas->speciesIndex("CO2");
+    int iC   = gas->elementIndex("C");
+    int iH2O = gas->speciesIndex("H2O");
+    int iH   = gas->elementIndex("H");
 
     for(int k=0; k<nspc; k++) {
-        domn->gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
+        gas->getAtoms(k, &atomArr[0]);           // [nelements] in sp k
         for(int m=0; m<(int)atomArr.size(); m++)
             elemM[m] += x[k] * atomArr[m];
         if(k != iO2)  nOnotFromO2  += atomArr[iO] * x[k];
@@ -394,23 +366,23 @@ double streams::getMixtureFraction(const double *y, const bool doBeta01) {
     double         beta;
 
     elemMF = setElementMassFracs(y);
-    beta   = gCHON[0] * elemMF[domn->gas->elementIndex("C")] +
-             gCHON[1] * elemMF[domn->gas->elementIndex("H")] +
-             gCHON[2] * elemMF[domn->gas->elementIndex("O")] +
-             gCHON[3] * elemMF[domn->gas->elementIndex("N")];
+    beta   = gCHON[0] * elemMF[gas->elementIndex("C")] +
+             gCHON[1] * elemMF[gas->elementIndex("H")] +
+             gCHON[2] * elemMF[gas->elementIndex("O")] +
+             gCHON[3] * elemMF[gas->elementIndex("N")];
 
     if(doBeta01) {
         elemMF = setElementMassFracs(&y0[0]);
-        beta0  = gCHON[0] * elemMF[domn->gas->elementIndex("C")] +
-                 gCHON[1] * elemMF[domn->gas->elementIndex("H")] +
-                 gCHON[2] * elemMF[domn->gas->elementIndex("O")] +
-                 gCHON[3] * elemMF[domn->gas->elementIndex("N")];
+        beta0  = gCHON[0] * elemMF[gas->elementIndex("C")] +
+                 gCHON[1] * elemMF[gas->elementIndex("H")] +
+                 gCHON[2] * elemMF[gas->elementIndex("O")] +
+                 gCHON[3] * elemMF[gas->elementIndex("N")];
 
         elemMF = setElementMassFracs(&y1[0]);
-        beta1  = gCHON[0] * elemMF[domn->gas->elementIndex("C")] +
-                 gCHON[1] * elemMF[domn->gas->elementIndex("H")] +
-                 gCHON[2] * elemMF[domn->gas->elementIndex("O")] +
-                 gCHON[3] * elemMF[domn->gas->elementIndex("N")];
+        beta1  = gCHON[0] * elemMF[gas->elementIndex("C")] +
+                 gCHON[1] * elemMF[gas->elementIndex("H")] +
+                 gCHON[2] * elemMF[gas->elementIndex("O")] +
+                 gCHON[3] * elemMF[gas->elementIndex("N")];
     }
 
     if( beta1-beta0 == 0 )

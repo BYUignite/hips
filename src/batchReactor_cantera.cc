@@ -45,9 +45,8 @@ void batchReactor_cantera::eval(double t, double *vars, double *dvarsdt, double 
     gas->setMassFractions_NoNorm(vars);
     gas->setState_HP(h_fixed, P_fixed);
 
-    vector<double> rr(gas->nSpecies());
-
     double rho = gas->density();
+    vector<double> rr(gas->nSpecies());
     kin->getNetProductionRates(&rr[0]);
     for (size_t k=0; k < gas->nSpecies(); k++)
         dvarsdt[k] = rr[k] * gas->molecularWeight(k) / rho;
