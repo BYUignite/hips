@@ -1,11 +1,14 @@
-i# HiPS (Hierarchical Parcel Swapping)
+# HiPS (Hierarchical Parcel Swapping)
 
 This code implements the Hierarchal Parcel Swapping (HiPS) model for turbulent reacting or nonreacting flows. 
 
 ## Documentation
- * [A. Kerstein, Hierarchical Parcel-Swapping Representation of Turbulent Mixing. Part 1. Formulation and Scaling Properties, Journal of Statistical Physics, 153:142-161 (2013)](https://link.springer.com/content/pdf/10.1007/s10955-013-0811-z.pdf)
- * [A. Kerstein, Hierarchical parcel-swapping representation of turbulent mixing. Part 2. Application to channel flow, Journal of Fluid Mechanics, 750:421-463 (2014)](https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/abs/hierarchical-parcelswapping-%20%20representation-of-turbulent-mixing-part-2-application-to-channel-flow/19D6D1CAC4D2FAFFC67A67925D7E527B)
- * [A. Kerstein, Hierarchical parcel-swapping representation of turbulent mixing. III. Origins of correlation patterns observed in turbulent boundary layers, Physical Review Fluids, 6, 044611    (2021)](https://journals.aps.org/prfluids/abstract/10.1103/PhysRevFluids.6.044611)
+ * Code documentation is available at [https://ignite.byu.edu/hips_documentation](https://ignite.byu.edu/hips_documentation)
+ * Publications
+    * [A. Kerstein, Hierarchical Parcel-Swapping Representation of Turbulent Mixing. Part 1. Formulation and Scaling Properties, Journal of Statistical Physics, 153:142-161 (2013)](https://link.springer.com/content/pdf/10.1007/s10955-013-0811-z.pdf)
+    * [A. Kerstein, Hierarchical parcel-swapping representation of turbulent mixing. Part 2. Application to channel flow, Journal of Fluid Mechanics, 750:421-463 (2014)](https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/abs/hierarchical-parcelswapping-%20%20representation-of-turbulent-mixing-part-2-application-to-channel-flow/19D6D1CAC4D2FAFFC67A67925D7E527B)
+    * [A. Kerstein, Hierarchical parcel-swapping representation of turbulent mixing. III. Origins of correlation patterns observed in turbulent boundary layers, Physical Review Fluids, 6, 044611    (2021)](https://journals.aps.org/prfluids/abstract/10.1103/PhysRevFluids.6.044611)
+
 ## Directory structure
 * `cmake_build`: build the code using cmake.
 * `data`: contains all data files output during a simulation.
