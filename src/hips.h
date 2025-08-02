@@ -22,6 +22,7 @@ public:
     int nparcels;                                                  ///< number of parcels
     int realization;                                               ///< number of realizations
     std::vector<std::shared_ptr<std::vector<double>>> varData;     ///< vector of pointers to vector
+    std::vector<double> varRho;                                    ///< density
     std::vector<int> pLoc;                                         ///< parcel index array for fast implementation of swaps
  
 #ifdef REACTIONS_ENABLED
@@ -65,7 +66,6 @@ private:
     randomGenerator rand;                                               
     
     std::vector<int> i_plus;                                       ///< ceil(i_batchelor)
-    std::vector<double> varRho;                                       
     std::vector<double> ScHips;                                    ///< vector containing Schmidt numbers related to each variable
     std::vector<std::string> varName;                              ///< vector containing the names of parcel variables
     std::vector<double> parcelTimes;                               ///< current times corresponding to the parcel states
@@ -89,52 +89,53 @@ private:
     ////////////////////////////// MEMBER FUNCTIONS /////////////////////////////
 
 public:
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Sets up the HiPS tree using explicitly specified tree parameters.
-///
-/// This method builds the binary HiPS tree using a user-defined number of levels and physical parameters.
-/// It also automatically adjusts the number of levels to account for high Schmidt numbers, ensuring that
-/// micromixing is properly resolved.
-///
-/// \param nLevels_         Base number of levels in the HiPS tree.
-/// \param domainLength_    Domain size for determining eddy length scales.
-/// \param tau0_            Time scale of the smallest eddy (Kolmogorov scale).
-/// \param ScHips_          Vector of Schmidt numbers (one per variable).
-///
-/// \note This function is used by the full constructor and can also be called manually after 
-///       using the dynamic constructor.
-///
-/// \warning The number of levels may be increased automatically for large Schmidt numbers 
-///          to ensure accurate scalar mixing across scales.
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets up the HiPS tree using explicitly specified tree parameters.
+    ///
+    /// This method builds the binary HiPS tree using a user-defined number of levels and physical parameters.
+    /// It also automatically adjusts the number of levels to account for high Schmidt numbers, ensuring that
+    /// micromixing is properly resolved.
+    ///
+    /// \param nLevels_         Base number of levels in the HiPS tree.
+    /// \param domainLength_    Domain size for determining eddy length scales.
+    /// \param tau0_            Time scale of the smallest eddy (Kolmogorov scale).
+    /// \param ScHips_          Vector of Schmidt numbers (one per variable).
+    ///
+    /// \note This function is used by the full constructor and can also be called manually after 
+    ///       using the dynamic constructor.
+    ///
+    /// \warning The number of levels may be increased automatically for large Schmidt numbers 
+    ///          to ensure accurate scalar mixing across scales.
+
+    void set_tree(int nLevels_, double domainLength_, double tau0_);  // setting the HiPS tree based on the number of levels
 
 
-    void set_tree(int nLevels_, double domainLength_, double tau0_, std::vector<double> &ScHips_);  // setting the HiPS tree based on the number of levels
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Dynamically builds the HiPS tree based on Reynolds number and a selected strategy.
-///
-/// This method configures the HiPS tree using a continuous Reynolds number and one of several 
-/// initialization strategies. It is intended for simulations where local turbulence conditions 
-/// change over time or space, requiring the tree to be updated dynamically.
-///
-/// \param Re_              Reynolds number used to determine base tree level.
-/// \param domainLength_    Domain length for spatial scaling.
-/// \param tau0_            Base time scale for the largest eddy.
-/// \param ScHips_          Vector of Schmidt numbers (one per variable).
-/// \param approach_        Strategy to convert continuous Re to tree level:
-///                         - "rounding"     → Round to nearest discrete level
-///                         - "probability"  → Use probabilistic interpolation between levels
-///                         - "micromixing"  → Use fixed level with adjusted mixing rate
-///                         - "dynamic_A"    → Adjust geometric scale factor A to fit Re
-///
-/// \note This method is ideal for Lagrangian simulations using grid cells with different Re values.
-///       It supports runtime reconfiguration of the tree without reinitializing the hips object.
-///
-/// \warning Ensure consistent `approach_` handling across the simulation to avoid inconsistencies.
-///
-/// \see hips::set_tree(int, ...) for direct-level setup.
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Dynamically builds the HiPS tree based on Reynolds number and a selected strategy.
+    ///
+    /// This method configures the HiPS tree using a continuous Reynolds number and one of several 
+    /// initialization strategies. It is intended for simulations where local turbulence conditions 
+    /// change over time or space, requiring the tree to be updated dynamically.
+    ///
+    /// \param Re_              Reynolds number used to determine base tree level.
+    /// \param domainLength_    Domain length for spatial scaling.
+    /// \param tau0_            Base time scale for the largest eddy.
+    /// \param ScHips_          Vector of Schmidt numbers (one per variable).
+    /// \param approach_        Strategy to convert continuous Re to tree level:
+    ///                         - "rounding"     → Round to nearest discrete level
+    ///                         - "probability"  → Use probabilistic interpolation between levels
+    ///                         - "micromixing"  → Use fixed level with adjusted mixing rate
+    ///                         - "dynamic_A"    → Adjust geometric scale factor A to fit Re
+    ///
+    /// \note This method is ideal for Lagrangian simulations using grid cells with different Re values.
+    ///       It supports runtime reconfiguration of the tree without reinitializing the hips object.
+    ///
+    /// \warning Ensure consistent `approach_` handling across the simulation to avoid inconsistencies.
+    ///
+    /// \see hips::set_tree(int, ...) for direct-level setup.
   
-    void set_tree(double Re_, double domainLength_, double tau0_, std::vector<double> &ScHips_, std::string approach_ = "rounding");
+    void set_tree(double Re_, double domainLength_, double tau0_, std::string approach_ = "rounding");
   
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,6 +212,7 @@ public:
     hips(double C_param_,
          int forceTurb_,
          int nVar_,
+         std::vector<double> &ScHips_,
          bool performReaction,
          std::shared_ptr<void> vcantSol = nullptr,
          int seed = 10,
