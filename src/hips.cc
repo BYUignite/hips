@@ -1205,6 +1205,7 @@ std::vector<double> hips::projection_back(std::vector<double> &vh) {
     int jprev = 0;
 
     for (int i = 0; i < nc; ++i) {
+
         for (int j = jprev + 1; j <= nh; ++j) {
             if (xh[j] <= xc[i + 1]) {
                 double d1 = xh[j] - xh[j - 1];
@@ -1295,7 +1296,8 @@ std::pair<std::vector<double>, std::vector<double>> hips::projection_back_with_d
         }
 
         // Normalize the results
-        vc[i] /= rho_c[i];
+        //doldb vc[i] /= rho_c[i];
+        vc[i] /= rho_c[i] * (xc[i + 1] - xc[i]);  //doldb fix
     }
     return {vc, rho_c};
 }
