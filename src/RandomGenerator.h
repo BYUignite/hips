@@ -4,7 +4,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-class randomGenerator {
+class RandomGenerator {
 
 private :
 
@@ -19,9 +19,9 @@ public :
         return mtwist.randInt(n);
     }
 
-   randomGenerator(const int aseed) : mtwist(aseed) {
+   RandomGenerator(const int aseed) : mtwist(aseed) {
        if(aseed < 0)                // randomize the seed
            mtwist.seed();
    }
-    randomGenerator() : mtwist() {}
+    RandomGenerator() : mtwist() {}
 };

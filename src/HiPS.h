@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "randomGenerator.h"
+#include "RandomGenerator.h"
 
 
 /// \brief Implementation of the HiPS (Hierarchical Parcel Swapping) model.
@@ -76,7 +76,7 @@ private:
     double lStar;                                                  ///< length of the level associated with the Reynolds number 
     double Anew;                                                   ///< adjusted level lengthscale reduction factor for dynamic adjustment of reduction factor
 
-    randomGenerator rand;                                               
+    RandomGenerator rand;
     
     std::vector<int> i_plus;                                       ///< ceil(i_batchelor)
     std::vector<double> ScHips;                                    ///< vector containing Schmidt numbers related to each variable

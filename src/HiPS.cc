@@ -5,7 +5,7 @@
 #include "batchReactor_cantera.h"
 #endif
 
-#include "randomGenerator.h"
+#include "RandomGenerator.h"
 
 #include <iostream>
 #include <iomanip>
