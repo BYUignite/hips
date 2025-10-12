@@ -10,7 +10,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class batchReactor {
+class BatchReactor {
 
 ////////////////////////////// DATA MEMBERS /////////////////////////////
 
@@ -32,7 +32,7 @@ public:
 
 public:
 
-    batchReactor() {};
+    BatchReactor() {};
 
     virtual void react(double &h, std::vector<double> &y, const double tRun) = 0;
     double getDensity() const { return rho; }       

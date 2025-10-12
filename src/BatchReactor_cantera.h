@@ -1,6 +1,6 @@
 #pragma once
 
-#include "batchReactor.h"
+#include "BatchReactor.h"
 #include "cantera/base/Solution.h"
 #include "cantera/thermo.h"
 #include "cantera/kinetics.h"
@@ -11,7 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class batchReactor_cantera : public batchReactor, public Cantera::FuncEval {
+class BatchReactor_cantera : public BatchReactor, public Cantera::FuncEval {
 
 ////////////////////// DATA MEMBERS /////////////////////
 
@@ -21,7 +21,7 @@ std::unique_ptr<Cantera::Integrator>  integrator; ///< Cantera cvode wrapper
 
 public: 
 
-    batchReactor_cantera(std::shared_ptr<Cantera::Solution> cantSol);
+    BatchReactor_cantera(std::shared_ptr<Cantera::Solution> cantSol);
 
     virtual void react(double &h, std::vector<double> &y, const double tRun);
 
@@ -33,5 +33,5 @@ public:
         gas->getMassFractions(y);
     }
 
-    virtual ~batchReactor_cantera() {}
+    virtual ~BatchReactor_cantera() {}
 };

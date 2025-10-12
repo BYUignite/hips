@@ -14,8 +14,8 @@ target_sources(hips PRIVATE
 
 if(REACTIONS_ENABLED)
     target_sources(hips PRIVATE
-        batchReactor_cvode.cc
-        batchReactor_cantera.cc
+        BatchReactor_cvode.cc
+        BatchReactor_cantera.cc
     )
 endif()
 

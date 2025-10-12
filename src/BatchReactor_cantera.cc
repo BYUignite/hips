@@ -1,7 +1,7 @@
-#include "batchReactor_cantera.h"
+#include "BatchReactor_cantera.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \brief Constructor for batchReactor_cantera.
+/// \brief Constructor for BatchReactor_cantera.
 /// 
 /// Initializes a batch reactor object using Cantera solution for simulations.
 /// 
@@ -9,7 +9,7 @@
 /// 
 ///////////////////////////////////////////////////////////////////////
 
-batchReactor_cantera::batchReactor_cantera(std::shared_ptr<Cantera::Solution> cantSol) {
+BatchReactor_cantera::BatchReactor_cantera(std::shared_ptr<Cantera::Solution> cantSol) {
     gas = cantSol->thermo(); 
     kin = cantSol->kinetics(); 
 
@@ -32,7 +32,7 @@ batchReactor_cantera::batchReactor_cantera(std::shared_ptr<Cantera::Solution> ca
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
-void batchReactor_cantera::react(double &h, std::vector<double> &y, const double tRun) {
+void BatchReactor_cantera::react(double &h, std::vector<double> &y, const double tRun) {
     // Set mass fractions and state
     gas->setMassFractions(&y[0]);
     gas->setState_HP(h, gas->pressure());
@@ -62,7 +62,7 @@ void batchReactor_cantera::react(double &h, std::vector<double> &y, const double
 /// \param not_used Unused parameter.
 /////////////////////////////////////////////////////////////////////////////////
 
-void batchReactor_cantera::eval(double t, double *vars, double *dvarsdt, double *not_used) {
+void BatchReactor_cantera::eval(double t, double *vars, double *dvarsdt, double *not_used) {
     // Set mass fractions and state
     gas->setMassFractions_NoNorm(vars);
     gas->setState_HP(h_fixed, P_fixed);

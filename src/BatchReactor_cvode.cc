@@ -1,4 +1,4 @@
-#include "batchReactor_cvode.h"
+#include "BatchReactor_cvode.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Callback function for the right-hand side of the ODE system used by CVODE.
@@ -8,14 +8,14 @@
 /// \param t Current time.
 /// \param varsCV N_Vector containing the variables (species concentrations).
 /// \param dvarsdtCV N_Vector containing the derivatives of the variables with respect to time.
-/// \param user_data Pointer to the user-defined data (batchReactor_cvode instance).
+/// \param user_data Pointer to the user-defined data (BatchReactor_cvode instance).
 /// \return 0 on success.
 ////////////////////////////////////////////////////////////////////////////////
 
 int rhsf_cvode(sunrealtype t, N_Vector varsCV, N_Vector dvarsdtCV, void *user_data);
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \brief Constructor for the batchReactor_cvode class.
+/// \brief Constructor for the BatchReactor_cvode class.
 /// 
 /// Initializes a batch reactor object using CVODE for simulations.
 /// 
@@ -23,7 +23,7 @@ int rhsf_cvode(sunrealtype t, N_Vector varsCV, N_Vector dvarsdtCV, void *user_da
 /// 
 ///////////////////////////////////////////////////////////////////////////////////
 
-batchReactor_cvode::batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSol) {
+BatchReactor_cvode::BatchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSol) {
 
     gas = cantSol->thermo(); 
     kin = cantSol->kinetics(); 
@@ -47,7 +47,7 @@ batchReactor_cvode::batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSo
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-void batchReactor_cvode::react(double &h, std::vector<double> &y, const double tRun) {
+void BatchReactor_cvode::react(double &h, std::vector<double> &y, const double tRun) {
 
     // Store fixed enthalpy and pressure
     h_fixed = h;
@@ -69,7 +69,7 @@ void batchReactor_cvode::react(double &h, std::vector<double> &y, const double t
 ////
 /////////////////////////////////////////////////////////////////////////////////////
 
-int batchReactor_cvode::rhsf(const double t, const double *vars, double *dvarsdt) {
+int BatchReactor_cvode::rhsf(const double t, const double *vars, double *dvarsdt) {
 
     // Set mass fractions and state
     gas->setMassFractions_NoNorm(vars);
@@ -92,22 +92,22 @@ int batchReactor_cvode::rhsf(const double t, const double *vars, double *dvarsdt
 
 /// \brief Callback function for the right-hand side of the ODE system used by CVODE.
 /// 
-/// This function is called by CVODE, which in turn calls the rhsf method of the batchReactor_cvode instance.
+/// This function is called by CVODE, which in turn calls the rhsf method of the BatchReactor_cvode instance.
 /// 
 /// \param t Current time.
 /// \param varsCV N_Vector containing the variables (species concentrations).
 /// \param dvarsdtCV N_Vector containing the derivatives of the variables with respect to time.
-/// \param user_data Pointer to the user-defined data (batchReactor_cvode instance).
+/// \param user_data Pointer to the user-defined data (BatchReactor_cvode instance).
 /// \return 0 on success.
 /////////////////////////////////////////////////////////////////////////////////
 
 int rhsf_cvode(sunrealtype t, N_Vector varsCV, N_Vector dvarsdtCV, void *user_data) {
  
-    batchReactor_cvode *bRxr = static_cast<batchReactor_cvode *>(user_data);       // Cast user_data pointer to batchReactor_cvode pointer
+    BatchReactor_cvode *bRxr = static_cast<BatchReactor_cvode *>(user_data);       // Cast user_data pointer to BatchReactor_cvode pointer
 
     double *vars    = N_VGetArrayPointer_Serial(varsCV);                                 // Get array pointers for variables and derivatives
 
-    double *dvarsdt = N_VGetArrayPointer_Serial(dvarsdtCV);                              // Call rhsf method of batchReactor_cvode instance
+    double *dvarsdt = N_VGetArrayPointer_Serial(dvarsdtCV);                              // Call rhsf method of BatchReactor_cvode instance
     
     int rv = bRxr->rhsf(t, vars, dvarsdt);
 

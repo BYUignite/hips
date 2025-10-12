@@ -1,8 +1,8 @@
 #include "HiPS.h"
 
 #ifdef REACTIONS_ENABLED
-#include "batchReactor_cvode.h"
-#include "batchReactor_cantera.h"
+#include "BatchReactor_cvode.h"
+#include "BatchReactor_cantera.h"
 #endif
 
 #include "RandomGenerator.h"
@@ -45,10 +45,10 @@ HiPS::HiPS(int nLevels_,
         gas = cantSol->thermo(); 
         nsp = gas->nSpecies();
 
-        bRxr = make_shared<batchReactor_cvode>(cantSol);                                // By default, use batchReactor_cvode
+        bRxr = make_shared<BatchReactor_cvode>(cantSol);                                // By default, use BatchReactor_cvode
 
-        // Uncomment the following line to switch to batchReactor_cantera
-        // bRxr = make_unique<batchReactor_cantera>(cantSol);
+        // Uncomment the following line to switch to BatchReactor_cantera
+        // bRxr = make_unique<BatchReactor_cantera>(cantSol);
 
         if(forceTurb)
             throw std::runtime_error("Error: forceTurb should be false if preformReaction is true");
@@ -86,10 +86,10 @@ HiPS::HiPS(double C_param_,
         nsp = gas->nSpecies();
 
         // Set up the default batch reactor (cvode).
-       // bRxr = make_shared<batchReactor_cvode>(cantSol);
+       // bRxr = make_shared<BatchReactor_cvode>(cantSol);
 
-        // Uncomment the following line to switch to batchReactor_cantera.
-         bRxr = make_shared<batchReactor_cantera>(cantSol);
+        // Uncomment the following line to switch to BatchReactor_cantera.
+         bRxr = make_shared<BatchReactor_cantera>(cantSol);
     }
     #endif
 

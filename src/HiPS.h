@@ -3,7 +3,7 @@
 #ifdef  REACTIONS_ENABLED
 #include "cantera/base/Solution.h"
 #include "cantera/thermo.h"
-#include "batchReactor.h"
+#include "BatchReactor.h"
 #endif
 
 #include <iostream>
@@ -22,7 +22,7 @@
 ///
 /// Dependencies:
 /// - YAML-CPP: Used for reading and parsing configuration files.
-/// - Batch reactor classes (`batchReactor_cvode.h`, `batchReactor_cantera.h`):
+/// - Batch reactor classes (`BatchReactor_cvode.h`, `BatchReactor_cantera.h`):
 ///   Included only when `REACTIONS_ENABLED` is defined, enabling reaction modeling.
 /// - Standard C++ libraries: Utilized for input/output, mathematical computations,
 ///   and data handling.
@@ -41,7 +41,7 @@ public:
 
 #ifdef REACTIONS_ENABLED
     std::shared_ptr<Cantera::ThermoPhase> gas;                     ///< Shared pointer to a Cantera thermochemistry object
-    std::shared_ptr<batchReactor> bRxr;                            ///< Unique pointer to the integrator object
+    std::shared_ptr<BatchReactor> bRxr;                            ///< Unique pointer to the integrator object
 #endif
 
     double domainLength;                                           ///< length of domain (m)
@@ -264,8 +264,8 @@ public:
 ///       to fully build the tree at initialization time. This setup is optimal for cases 
 ///       where tree reconfiguration is not needed during runtime.
 ///
-/// \note If `REACTIONS_ENABLED` is defined, the default chemical integrator is `batchReactor_cvode`.
-///       To use `batchReactor_cantera` instead, uncomment the corresponding line in the constructor code.
+/// \note If `REACTIONS_ENABLED` is defined, the default chemical integrator is `BatchReactor_cvode`.
+///       To use `BatchReactor_cantera` instead, uncomment the corresponding line in the constructor code.
 ///
 /// \see HiPS::set_tree() for the internal tree setup logic.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
