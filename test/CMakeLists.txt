@@ -48,3 +48,27 @@ if(REACTIONS_ENABLED)
     install(TARGETS test_rxn.x DESTINATION "${PROJECT_SOURCE_DIR}/run")
 
 endif()
+
+############################################################################
+
+add_executable(tdd.x)
+target_sources(tdd.x PRIVATE tdd.cc)
+
+#--------------------
+
+set_property(TARGET tdd.x PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)  # adds LC_RPATH to executable
+
+target_include_directories(tdd.x PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_include_directories(tdd.x PRIVATE "$ENV{CONDA_PREFIX}/include")
+target_link_directories(   tdd.x PRIVATE "$ENV{CONDA_PREFIX}/lib")
+
+#--------------------
+
+find_package(Catch2 3 REQUIRED)
+target_link_libraries(tdd.x PRIVATE Catch2::Catch2WithMain hips)
+
+#--------------------
+
+install(TARGETS tdd.x DESTINATION "${PROJECT_SOURCE_DIR}/run")
+
+############################################################################
