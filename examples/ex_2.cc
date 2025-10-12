@@ -30,7 +30,7 @@
 /// - Cantera library (for chemical kinetics)
 
 ///////////////////////////////////////////////////////////////////////////////////////
-#include "hips.h"
+#include "HiPS.h"
 #include "cantera/base/Solution.h"
 #include "cantera/thermo.h"
 
@@ -60,9 +60,9 @@ int main() {
     int nVar = nsp + 1; // Number of variables (species + enthalpy)
 
     // Create HiPS instance with reaction support
-    hips HiPS(nLevels, domainLength, tau0, C_param, forceTurb, nVar, ScHips, true, cantSol, 11);
+    HiPS hips(nLevels, domainLength, tau0, C_param, forceTurb, nVar, ScHips, true, cantSol, 11);
 
-    int nparcels = HiPS.get_nparcels();
+    int nparcels = hips.get_nparcels();
 
     // Define variables for species mass fractions, temperature, and enthalpy
     vector<vector<double>> ysp(nsp, vector<double>(nparcels, 0));
@@ -118,18 +118,18 @@ int main() {
     vector<double> weight(nparcels, 1.0 / nparcels); // Uniform weights
 
     // Assign variables to HiPS
-    HiPS.set_varData(h, weight, variableNames[0], rho);
+    hips.set_varData(h, weight, variableNames[0], rho);
     for (int k = 0; k < ysp.size(); k++) 
-        HiPS.set_varData(ysp[k], weight, variableNames[k + 1], rho);
+        hips.set_varData(ysp[k], weight, variableNames[k + 1], rho);
 
     // Set output interval in terms of time
-    HiPS.setOutputIntervalTime(tRun/10);  // Save results every 100 seconds
+    hips.setOutputIntervalTime(tRun/10);  // Save results every 100 seconds
 
     // Write initial condition
-    HiPS.writeData(1, 0, 0.0 );
+    hips.writeData(1, 0, 0.0 );
   
     // Run the combustion simulation
-    HiPS.calculateSolution(tRun, true);
+    hips.calculateSolution(tRun, true);
 
     return 0;
 }

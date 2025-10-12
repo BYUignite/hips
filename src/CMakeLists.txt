@@ -4,12 +4,12 @@ add_library(hips SHARED)
 add_library(hips::hips ALIAS hips)
 
 target_sources(hips PRIVATE 
-    hips.cc                 
+    HiPS.cc
     PUBLIC
     FILE_SET hips_headers
         TYPE HEADERS
         BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" 
-        FILES hips.h
+        FILES HiPS.h
 )
 
 if(REACTIONS_ENABLED)

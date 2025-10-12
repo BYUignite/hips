@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "hips.h"
+#include "HiPS.h"
 
 #include <memory>
 #include <cmath>
@@ -27,7 +27,7 @@ TEST_CASE( "Test HiPS library" ) {
         int            nvars = 1;         // Number of scalar fields
         bool           forceTurb = true;  // Forcing parameter to impose turbulent profile (not applicable here)
 
-        hips H(nLevels, domainLength, tau0, C_param, forceTurb, nvars, ScHips, false);
+        HiPS hips(nLevels, domainLength, tau0, C_param, forceTurb, nvars, ScHips, false);
 
         vector<double> var = {0.985, 0.784, 0.508, 0.404, 0.913, 0.126, 0.561};
         vector<double> w   = {0.422, 6.845, 0.851, 7.806, 3.512, 4.258, 2.071};   // test: not a power of 2, not uniform, don't sum to 1
@@ -42,18 +42,18 @@ TEST_CASE( "Test HiPS library" ) {
 
         //--------- compute sum of HiPS projected variable
 
-        H.set_varData(var, w, "test");
-        auto pLoc    = H.get_pLoc();
-        auto varData = H.get_HipsVarData_ptr();
+        hips.set_varData(var, w, "test");
+        auto pLoc    = hips.get_pLoc();
+        auto varData = hips.get_HipsVarData_ptr();
 
         double sum2 = 0.0;
-        for(int i=0; i<H.get_nparcels(); i++)
+        for(int i=0; i<hips.get_nparcels(); i++)
             sum2 += (*varData[0])[pLoc[i]];
-        sum2 /= H.get_nparcels();
+        sum2 /= hips.get_nparcels();
 
         //------------ compute back_projected sum
 
-        auto var2 = H.get_varData();
+        auto var2 = hips.get_varData();
         double sum3 = 0.0;
         for(int i=0; i<var2[0].size(); i++)
             sum3 += var2[0][i]*w[i];
@@ -73,33 +73,33 @@ TEST_CASE( "Test HiPS library" ) {
         int            nvars = 3;                    // Number of scalar fields
         bool           forceTurb = true;             // Forcing parameter to impose turbulent profile
 
-        hips H(nLevels, domainLength, tau0, C_param, forceTurb, nvars, ScHips, false);
+        HiPS hips(nLevels, domainLength, tau0, C_param, forceTurb, nvars, ScHips, false);
 
         //--------- initialize vars
 
-        vector<vector<double>> vars(nvars, vector<double>(H.get_nparcels()));
-        vector<double> weights(H.get_nparcels(), 1.0/H.get_nparcels());  // Uniform weights
+        vector<vector<double>> vars(nvars, vector<double>(hips.get_nparcels()));
+        vector<double> weights(hips.get_nparcels(), 1.0/hips.get_nparcels());  // Uniform weights
 
         for (int k=0; k<nvars; k++) {
-            for (int i=0; i<H.get_nparcels(); i++)
-                vars[k][i] = (i<H.get_nparcels()/2) ? 0 : 1;
-            H.set_varData(vars[k], weights, "mixf_0" + to_string(k));
+            for (int i=0; i<hips.get_nparcels(); i++)
+                vars[k][i] = (i<hips.get_nparcels()/2) ? 0 : 1;
+            hips.set_varData(vars[k], weights, "mixf_0" + to_string(k));
         }
         
         //--------- inititial raw conservation
 
         vector<double> sum1(nvars, 0.0);
-        for(int i=0; i<H.get_nparcels(); i++)
+        for(int i=0; i<hips.get_nparcels(); i++)
             for(int k=0; k<nvars; k++)
                 sum1[k] += vars[k][i]*weights[i];
 
         //--------- solve
 
-        H.calculateSolution(tRun, false);
+        hips.calculateSolution(tRun, false);
 
         //--------- recover variables, final conservation
 
-        auto var2 = H.get_varData();
+        auto var2 = hips.get_varData();
 
         vector<double> sum2(var2.size(), 0.0);
         for(int i=0; i<var2[0].size(); i++)
@@ -108,7 +108,7 @@ TEST_CASE( "Test HiPS library" ) {
 
         //--------- test
 
-        REQUIRE( H.get_nparcels() == (1 << (nLevels+1)) );        // based on ScHips set above
+        REQUIRE( hips.get_nparcels() == (1 << (nLevels+1)) );        // based on ScHips set above
         REQUIRE_THAT(sum1[0],      WithinRel(sum2[0], 1E-14));
         REQUIRE_THAT(sum1[1],      WithinRel(sum2[1], 1E-14));
         REQUIRE_THAT(sum1[2],      WithinRel(sum2[2], 1E-14));

@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <vector>
-#include "hips.h"
+#include "HiPS.h"
 
 using namespace std;
 
@@ -57,8 +57,8 @@ int main() {
     int numVariables = 3;                      // Number of scalar fields
 
     // Set up HiPS tree and calculate the number of parcels
-    hips HiPS(nLevels, domainLength, tau0, C_param, forceTurb, numVariables, ScHips, false);
-    int numParcels = HiPS.get_nparcels()
+    HiPS hips(nLevels, domainLength, tau0, C_param, forceTurb, numVariables, ScHips, false);
+    int numParcels = hips.get_nparcels()
 ;
 
     // Initialize mixing fractions for each scalar variable
@@ -68,17 +68,17 @@ int main() {
     for (int i = 0; i < numVariables; ++i) {
         // Initialize mixing fractions for variable i
         mixingFractions[i] = initializeMixingFractions(numParcels);
-        HiPS.set_varData(mixingFractions[i], weights, "mixf_0" + to_string(i));
+        hips.set_varData(mixingFractions[i], weights, "mixf_0" + to_string(i));
     }
 
     // Set output interval in terms of time
-    HiPS.setOutputIntervalTime(60.0);  // Save results every 100 seconds
+    hips.setOutputIntervalTime(60.0);  // Save results every 100 seconds
 
     // Write initial condition
-    HiPS.writeData(1, 0, 0.0 );
+    hips.writeData(1, 0, 0.0 );
 
     // Run the simulation and calculate mixing dynamics
-    HiPS.calculateSolution(tRun, true);
+    hips.calculateSolution(tRun, true);
 
     return 0;
 }

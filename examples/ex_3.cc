@@ -21,7 +21,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include "hips.h"
+#include "HiPS.h"
 
 using namespace std;
 
@@ -34,7 +34,7 @@ int main() {
     vector<double> ScHips = {1.0};    // Schmidt numbers for low and high diffusivity
     bool performReaction = false;
 
-    hips HiPS(C_param, forceTurb, nVar, ScHips, performReaction);
+    HiPS hips(C_param, forceTurb, nVar, ScHips, performReaction);
 
     //--------- initialize pseudo CFD variable
 
@@ -70,20 +70,20 @@ int main() {
         int nLevels = 9;                           // Number of levels
         double domainLength = 1.0;                 // domain length scale
 
-        HiPS.set_tree(nLevels, domainLength, tau0);
+        hips.set_tree(nLevels, domainLength, tau0);
 
         //---------- set variables (CFD particles to HiPS parcels)
 
-        HiPS.set_varData(var[iCell], w[iCell], "mixf");
+        hips.set_varData(var[iCell], w[iCell], "mixf");
         
         //---------- advance hips
 
         double tRun = 300.0;
-        HiPS.calculateSolution(tRun);
+        hips.calculateSolution(tRun);
 
         //---------- get variables (HiPS parcels to CFD particles)
 
-        var[iCell] = HiPS.get_varData()[0];
+        var[iCell] = hips.get_varData()[0];
     }
 
     /////////////// USER CFD steps ...

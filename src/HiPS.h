@@ -13,9 +13,22 @@
 #include <memory>
 #include "randomGenerator.h"
 
-class hips {
 
-    ////////////////////////////// DATA MEMBERS /////////////////////////////
+/// \brief Implementation of the HiPS (Hierarchical Parcel Swapping) model.
+///
+/// This file contains the core implementation of the HiPS model, used for
+/// simulating turbulent mixing. It supports optional functionality for chemical
+/// reactions, which can be enabled by defining the `REACTIONS_ENABLED` macro.
+///
+/// Dependencies:
+/// - YAML-CPP: Used for reading and parsing configuration files.
+/// - Batch reactor classes (`batchReactor_cvode.h`, `batchReactor_cantera.h`):
+///   Included only when `REACTIONS_ENABLED` is defined, enabling reaction modeling.
+/// - Standard C++ libraries: Utilized for input/output, mathematical computations,
+///   and data handling.
+///
+/// \note Define `REACTIONS_ENABLED` at compile time to enable chemical reaction functionality.
+class HiPS {
 
 public:
   
@@ -50,7 +63,7 @@ private:
     int nL;                                                        ///< adjusted number of levels based on the Reynolds number
     bool forceTurb;                                                ///< forcing function for statistically stationary: -1 = none, 1 = source term, 2 = dir
 
-    bool LScHips;                                                  ///< hips schmidt number
+    bool LScHips;                                                  ///< HiPS schmidt number
     bool performReaction;                                          ///< flag indicating whether chemical reactions are performed in the simulation 
         
     double time;                                                   ///< current simulation time
@@ -130,11 +143,11 @@ public:
     ///                         - "dynamic_A"    → Adjust geometric scale factor A to fit Re
     ///
     /// \note This method is ideal for Lagrangian simulations using grid cells with different Re values.
-    ///       It supports runtime reconfiguration of the tree without reinitializing the hips object.
+    ///       It supports runtime reconfiguration of the tree without reinitializing the HiPS object.
     ///
     /// \warning Ensure consistent `ReApproach_` handling across the simulation to avoid inconsistencies.
     ///
-    /// \see hips::set_tree(int, ...) for direct-level setup.
+    /// \see HiPS::set_tree(int, ...) for direct-level setup.
   
     void set_tree(double Re_, double domainLength_, double tau0_, std::string ReApproach_ = "rounding");
   
@@ -163,12 +176,12 @@ public:
 
 private:
 
-    std::vector<double> projection(std::vector<double> &vcfd, std::vector<double> &weight);         // Perform vector projection of flow particles onto hips parcels operation without density 
+    std::vector<double> projection(std::vector<double> &vcfd, std::vector<double> &weight);         // Perform vector projection of flow particles onto HiPS parcels operation without density
     
     std::pair<std::vector<double>, std::vector<double>>  projection(std::vector<double> &vcfd, std::vector<double> &weight,                     
-                                   const std::vector<double> &density);                             // Perform vector projection flow particles onto hips parcels operation with density 
+                                   const std::vector<double> &density);                             // Perform vector projection flow particles onto HiPS parcels operation with density
     
-    std::vector<double> setGridHips(int N);                                                         // Set Hips grid with a specified number of grid points equal to number of parcels   
+    std::vector<double> setGridHips(int N);                                                         // Set HiPS grid with a specified number of grid points equal to number of parcels
     std::vector<double> setGridCfd(std::vector<double> &w);                                         // Set CFD grid using provided weight vector
     std::vector<double> projection_back(std::vector<double> &vb);                       
     std::vector<double> projection_back_with_density(std::vector<double> &vh, 
@@ -178,7 +191,7 @@ private:
 
 
 
-    void sample_hips_eddy(double &dt, int &iLevel);                                                 // Sample hips eddy with specified time step and level                                                
+    void sample_hips_eddy(double &dt, int &iLevel);                                                 // Sample HiPS eddy with specified time step and level
     void selectAndSwapTwoSubtrees(const int iLevel, int &iTree);                                    // Select and swap two subtrees in the level tree
     void advanceHips(const int iLevel, const int iTree);                                            // Advancing simulations to do mixing and reaction
    
@@ -215,10 +228,10 @@ public:
 ///
 /// \note See the full constructor for chemical integrator behavior under `REACTIONS_ENABLED`.
 ///
-/// \see hips::set_tree() for deferred tree construction.
+/// \see HiPS::set_tree() for deferred tree construction.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
    
-    hips(double C_param_,
+    HiPS(double C_param_,
          bool forceTurb_,
          int nVar_,
          std::vector<double> &ScHips_,
@@ -254,11 +267,11 @@ public:
 /// \note If `REACTIONS_ENABLED` is defined, the default chemical integrator is `batchReactor_cvode`.
 ///       To use `batchReactor_cantera` instead, uncomment the corresponding line in the constructor code.
 ///
-/// \see hips::set_tree() for the internal tree setup logic.
+/// \see HiPS::set_tree() for the internal tree setup logic.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    hips(int nLevels_,
+    HiPS(int nLevels_,
          double domainLength_,
          double tau0_,
          double C_param_,

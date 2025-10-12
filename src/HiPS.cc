@@ -1,22 +1,4 @@
-
-/// \file hips.cc
-/// \brief Implementation of the HiPS (Hierarchical Parcel Swapping) model.
-///
-/// This file contains the core implementation of the HiPS model, used for 
-/// simulating turbulent mixing. It supports optional functionality for chemical 
-/// reactions, which can be enabled by defining the `REACTIONS_ENABLED` macro.
-///
-/// Dependencies:
-/// - YAML-CPP: Used for reading and parsing configuration files.
-/// - Batch reactor classes (`batchReactor_cvode.h`, `batchReactor_cantera.h`): 
-///   Included only when `REACTIONS_ENABLED` is defined, enabling reaction modeling.
-/// - Standard C++ libraries: Utilized for input/output, mathematical computations, 
-///   and data handling.
-///
-/// \note Define `REACTIONS_ENABLED` at compile time to enable chemical reaction functionality.
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "hips.h"
+#include "HiPS.h"
 
 #ifdef REACTIONS_ENABLED
 #include "batchReactor_cvode.h"
@@ -35,8 +17,7 @@
 
 using namespace std;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-hips::hips(int nLevels_, 
+HiPS::HiPS(int nLevels_,
            double domainLength_, 
            double tau0_, 
            double C_param_, 
@@ -81,9 +62,7 @@ hips::hips(int nLevels_,
     set_tree(nLevels, domainLength, tau0);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-hips::hips(double C_param_, 
+HiPS::HiPS(double C_param_,
            bool forceTurb_,
            int nVar_,
            vector<double> &ScHips_,
@@ -119,9 +98,9 @@ hips::hips(double C_param_,
     varName.resize(nVar);        
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hips::set_tree(int nLevels_, double domainLength_, double tau0_){    
+
+void HiPS::set_tree(int nLevels_, double domainLength_, double tau0_){
  
     nLevels= nLevels_; 
     domainLength = domainLength_; 
@@ -209,9 +188,7 @@ void hips::set_tree(int nLevels_, double domainLength_, double tau0_){
     currentIndex = 0.0;
 } 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void hips::set_tree(double Re_, double domainLength_, double tau0_, std::string ReApproach_) {
+void HiPS::set_tree(double Re_, double domainLength_, double tau0_, std::string ReApproach_) {
     Re = Re_;
     domainLength = domainLength_;
     tau0 = tau0_;
@@ -340,7 +317,7 @@ void hips::set_tree(double Re_, double domainLength_, double tau0_, std::string 
 ///          directly influence the projection and subsequent simulations.
 ////////////////////////////////////////////////////////////////////////////////////
 
-void hips::set_varData(std::vector<double> &v, std::vector<double> &w, const std::string &varN) {  
+void HiPS::set_varData(std::vector<double> &v, std::vector<double> &w, const std::string &varN) {
     
     varData[currentIndex] = std::make_shared<std::vector<double>>(projection(v, w));
     varName[currentIndex] = varN;
@@ -368,7 +345,7 @@ void hips::set_varData(std::vector<double> &v, std::vector<double> &w, const std
 ///          requirements. Improper density values may lead to inaccuracies or instabilities in the simulation.
 ////////////////////////////////////////////////////////////////////////////////////
 
-void hips::set_varData(std::vector<double> &v, std::vector<double> &w, const std::string &varN, const std::vector<double> &rho) {
+void HiPS::set_varData(std::vector<double> &v, std::vector<double> &w, const std::string &varN, const std::vector<double> &rho) {
 
     std::pair<std::vector<double>, std::vector<double>> results = projection(v, w, rho);
 
@@ -401,10 +378,10 @@ void hips::set_varData(std::vector<double> &v, std::vector<double> &w, const std
 ///          may result in undefined behavior or incorrect projections.
 ///////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> hips::projection(std::vector<double> &vcfd, std::vector<double> &weight) {
+std::vector<double> HiPS::projection(std::vector<double> &vcfd, std::vector<double> &weight) {
     
     xc = setGridCfd(weight);                               // Populate the physical domain for flow particles
-    xh = setGridHips(nparcels);                            // Populate the physical domain for hips parcels
+    xh = setGridHips(nparcels);                            // Populate the physical domain for HiPS parcels
 
     int nc = xc.size() - 1;                 
     int nh = xh.size() - 1; 
@@ -486,7 +463,7 @@ std::vector<double> hips::projection(std::vector<double> &vcfd, std::vector<doub
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::pair<std::vector<double>, std::vector<double>> 
-hips::projection(std::vector<double> &vcfd, 
+HiPS::projection(std::vector<double> &vcfd,
                  std::vector<double> &weight, 
                  const std::vector<double> &density) {
     // Build CFD and HiPS grids
@@ -560,7 +537,7 @@ hips::projection(std::vector<double> &vcfd,
 ///          negative weights may lead to undefined behavior or invalid domain generation.
 /////////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> hips::setGridCfd(std::vector<double> &w) {
+std::vector<double> HiPS::setGridCfd(std::vector<double> &w) {
 
     double sumw = 0.0;
     for(int i=0; i<w.size(); i++)
@@ -598,7 +575,7 @@ std::vector<double> hips::setGridCfd(std::vector<double> &w) {
 ///          Validate the input to avoid unexpected behavior.
 ///////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> hips::setGridHips(int N){
+std::vector<double> HiPS::setGridHips(int N){
 
     std::vector<double> xh(N + 1);                               // Initialize a vector to hold the grid points
     double step = 1.0 / N;                                       // Calculate the step size
@@ -643,10 +620,10 @@ std::vector<double> hips::setGridHips(int N){
 /// \warning Long simulations may generate many output files. Adjust output intervals or 
 ///          disable writing (`shouldWriteData = false`) to manage storage needs.
 ///
-/// \see hips::writeData(), hips::saveAllParameters()
+/// \see HiPS::writeData(), HiPS::saveAllParameters()
 ///////////////////////////////////////////////////////////////////////////////////
 
-void hips::calculateSolution(const double tRun, bool shouldWriteData) {
+void HiPS::calculateSolution(const double tRun, bool shouldWriteData) {
     
     unsigned long long nEddies = 0;                               // Number of eddy events
     int fileCounter = 0;                                          // Number of data files written
@@ -718,7 +695,7 @@ void hips::calculateSolution(const double tRun, bool shouldWriteData) {
 ///          in simulations where determinism is necessary.
 ////////////////////////////////////////////////////////////////////////////////
 
-void hips::sample_hips_eddy(double &dtEE, int &iLevel) {
+void HiPS::sample_hips_eddy(double &dtEE, int &iLevel) {
 
     static double c1 = 1.0 - pow(2.0, 5.0/3.0*(iEta+1));
     static double c2 = pow(2.0, Nm2) - pow(2.0, iEta+1);
@@ -800,7 +777,7 @@ void hips::sample_hips_eddy(double &dtEE, int &iLevel) {
 ///          properly initialized before invoking this function.
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hips::selectAndSwapTwoSubtrees(const int iLevel, int &iTree) {
+void HiPS::selectAndSwapTwoSubtrees(const int iLevel, int &iTree) {
 
     iTree = rand.getRandInt((1 << iLevel)-1);
     int zero_q = rand.getRandInt(1);                                    // 0q where q is 0 or 1
@@ -842,7 +819,7 @@ void hips::selectAndSwapTwoSubtrees(const int iLevel, int &iTree) {
 ///          correspond to valid levels and nodes within the tree to prevent undefined behavior.
 //////////////////////////////////////////////////////////////////////////////////
 
-void hips::advanceHips(const int iLevel, const int iTree) {
+void HiPS::advanceHips(const int iLevel, const int iTree) {
 
     if (forceTurb && iLevel == 0) {
         forceProfile();                                                  // Forcing for statistically stationary
@@ -877,7 +854,7 @@ void hips::advanceHips(const int iLevel, const int iTree) {
 /// ### Usage Example:
 /// ```cpp
 /// // Assume varName list is populated: {"temperature", "enthalpy", "density"}
-/// int index = hips.get_varIndex("enthalpy");  // Returns 1
+/// int index = HiPS.get_varIndex("enthalpy");  // Returns 1
 /// ```
 ///
 /// \note This function is case-sensitive and assumes that the `varName` list has been populated,
@@ -890,7 +867,7 @@ void hips::advanceHips(const int iLevel, const int iTree) {
 /// \see set_varData
 ///////////////////////////////////////////////////////////////////////////////
 
-int hips::getVariableIndex(const std::string &varName) const {
+int HiPS::getVariableIndex(const std::string &varName) const {
 
     auto it = std::find(this->varName.begin(), this->varName.end(), varName);
     if (it == this->varName.end()) {
@@ -930,7 +907,7 @@ int hips::getVariableIndex(const std::string &varName) const {
 ///          Missing or incorrectly configured varName entries may lead to runtime errors.
 ///////////////////////////////////////////////////////////////////////////////
 
-void hips::reactParcels_LevelTree(const int iLevel, const int iTree) {
+void HiPS::reactParcels_LevelTree(const int iLevel, const int iTree) {
 
   #ifdef REACTIONS_ENABLED
     // ---- cache indices once
@@ -1025,7 +1002,7 @@ void hips::reactParcels_LevelTree(const int iLevel, const int iTree) {
 ///
 /// \warning Ensure that \p iLevel and \p iTree correspond to valid levels and subtrees in the HiPS structure to prevent undefined behavior.
 ////////////////////////////////////////////////////////////////////////////////////////////
-void hips::mixAcrossLevelTree(int kVar, const int iLevel, const int iTree) {
+void HiPS::mixAcrossLevelTree(int kVar, const int iLevel, const int iTree) {
     
     int istart;
     int iend;
@@ -1111,7 +1088,7 @@ void hips::mixAcrossLevelTree(int kVar, const int iLevel, const int iTree) {
 /// - Unbounded or inappropriate variable values may lead to unexpected results.
 ///////////////////////////////////////////////////////////////////////////
  
-void hips::forceProfile() {
+void HiPS::forceProfile() {
     // Loop through each variable in the HiPS profile
     for (int k = 0; k < varData.size(); k++) {
         double s=0;                                                  // Temporary variable for summation
@@ -1167,7 +1144,7 @@ void hips::forceProfile() {
 ///   an error or silently fail. Ensure file system permissions and disk space are sufficient.
 ///////////////////////////////////////////////////////////////////////////////////
 
-void hips::writeData(int real, const int ifile, const double outputTime) {
+void HiPS::writeData(int real, const int ifile, const double outputTime) {
 
     stringstream ss1, ss2;
     string s1, s2;
@@ -1274,11 +1251,11 @@ void hips::writeData(int real, const int ifile, const double outputTime) {
 //  i=    0         1         2         3
 //   |    *    |    *    |    *    |    *    |
 
-//  hips
+//  HiPS
 //   | * | * | * | * | * | * | * | * | * | * |
 //  j= 0   1   2   3   4   5   6   7   8   9
 
-std::vector<double> hips::projection_back(std::vector<double> &vh) {
+std::vector<double> HiPS::projection_back(std::vector<double> &vh) {
 
     int nh = xh.size() - 1;
     int nc = xc.size() - 1;
@@ -1314,7 +1291,7 @@ std::vector<double> hips::projection_back(std::vector<double> &vh) {
     return vc;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /// \brief Projects HiPS parcel values and densities back onto the flow particles (CFD cells).
 ///
 /// This function reverses the projection process, redistributing both the values and densities stored 
@@ -1350,9 +1327,9 @@ std::vector<double> hips::projection_back(std::vector<double> &vh) {
 /// \warning 
 /// - Ensure that the HiPS parcels are populated with valid values and densities before invoking this function.
 /// - Mismatches in data sizes between HiPS parcels and flow particles may lead to inaccurate results.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> hips::projection_back_with_density(std::vector<double> &vh, 
+
+std::vector<double> HiPS::projection_back_with_density(std::vector<double> &vh,
                                                        std::vector<double> &rho_h,
                                                        std::vector<double> &rho_c) {
     const int nh = static_cast<int>(xh.size()) - 1;  // # HiPS parcels
@@ -1417,7 +1394,7 @@ std::vector<double> hips::projection_back_with_density(std::vector<double> &vh,
 /// - The returned data structure should be interpreted according to the simulation setup and variable ordering.
 //////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<std::vector<double>> hips::get_varData() {
+std::vector<std::vector<double>> HiPS::get_varData() {
     std::vector<std::vector<double>> varDataProjections;
 
     for (int i = 0; i < varData.size(); i++) {
@@ -1456,7 +1433,7 @@ std::vector<std::vector<double>> hips::get_varData() {
 ///   before invoking this function.
 ///////////////////////////////////////////////////////////////////////////////////
 
-std::pair<std::vector<std::vector<double>>, std::vector<double>> hips::get_varData_with_density() {
+std::pair<std::vector<std::vector<double>>, std::vector<double>> HiPS::get_varData_with_density() {
     std::vector<std::vector<double>> varDataProjections;
     
     // Reorder varRho based on pLoc
@@ -1495,7 +1472,7 @@ std::pair<std::vector<std::vector<double>>, std::vector<double>> hips::get_varDa
 ///       To revert to default settings, the user must explicitly set a new interval or avoid calling this function.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hips::setOutputIntervalEddy(int interval) {
+void HiPS::setOutputIntervalEddy(int interval) {
 
     outputIntervalEddy = interval;
     useEddyBasedWriting = true;  ///< Enables eddy-based writing
@@ -1515,7 +1492,7 @@ void hips::setOutputIntervalEddy(int interval) {
 ///       To revert to default settings, the user must explicitly set a new interval or avoid calling this function.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void hips::setOutputIntervalTime(double interval) {
+void HiPS::setOutputIntervalTime(double interval) {
 
     outputIntervalTime = interval;
     useTimeBasedWriting = true;  ///< Enables time-based writing
@@ -1536,7 +1513,7 @@ void hips::setOutputIntervalTime(double interval) {
 /// \warning If the file cannot be openedx, an error message is printed, and no data is saved.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hips::saveAllParameters() {
+void HiPS::saveAllParameters() {
 
     std::string filepath = "../post/parameters.dat";  ///< Output file path for simulation parameters
     std::ofstream file(filepath);
