@@ -92,8 +92,25 @@ RUN git clone https://github.com/Cantera/cantera.git -b 3.1 --depth=1 \
 # Set the working directory
 WORKDIR /app/hips
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN cat > /entrypoint.sh << 'EOF' && chmod +x /entrypoint.sh
+#!/bin/sh
+
+if [ ! -d "installed" ]; then
+
+    mkdir build
+    cd build
+    cmake -D REACTIONS_ENABLED=ON -D HIPS_BUILD_DOCS=ON -D HIPS_BUILD_EXAMPLES=ON -D HIPB_BUILD_TESTS=ON ..
+    make -j
+    make install
+    cd ../
+
+fi
+
+exec "$@"
+EOF
+
+# Set the working directory
+WORKDIR /app/hips
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/sh"]
