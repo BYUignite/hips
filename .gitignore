@@ -1,4 +1,7 @@
 build
 run
 installed
+data/rlz*
+post/processed*
+
 .DS_Store
