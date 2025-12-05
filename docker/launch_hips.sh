@@ -4,10 +4,13 @@
 # instructions.
 docker build -t hips_img .
 
-# If a container named 'hips' is already running, stop it. 
-if [ -n "$(docker ps -q -f name=hips -f status=running)" ]; then
+# If a container named 'hips' is already running, stop it.
+if [ -n "$(docker ps -q -f name=^/hips$ -f status=running)" ]; then
     docker stop hips
 fi
 
+# Remove any existing container named 'hips' (running or stopped)
+docker rm hips 2>/dev/null || true
+
 # Run the Docker container with a bind mount to the host's hips directory.
-docker run --rm --name hips -it -v "$(pwd)/..":/app/hips hips_img   
+docker run --rm --name hips -it -v "$(pwd)/..":/app/hips hips_img

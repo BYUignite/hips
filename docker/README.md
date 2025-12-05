@@ -25,5 +25,5 @@
 
 **Building & Rebuilding:**
 - HiPS builds automatically on first run and skips building on subsequent runs through `launch_hips.sh`
-- If the Docker is modified, running `launch_hips.sh` will always update the image with the changes.
+- If the Dockerfile is modified, running `launch_hips.sh` will always update the image with the changes.
 - **When source code is modified:** Run `cd build && make -j8 && make install` inside the container to rebuild
