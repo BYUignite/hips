@@ -19,7 +19,7 @@ ______________
 
 **Docker Setup:**
 - The `launch_hips.sh` script initializes the docker setup and can be used to enter the container at any time
-- The first run produces an `entrypoint.sh` file is run anytime the container is open and ensures HiPS is installed in the container. It doesn't rebuild HiPS if source code is edited, however, to account for cases when   
+- The first run produces an `entrypoint.sh` file that is run anytime the container is open and ensures HiPS is installed in the container; however, it doesn't rebuild HiPS if source code is edited, so you must rebuild manually after making changes.
 - The container provides the complete build environment (dependencies, compilers) for HiPS
 
 **File Sharing & Workflow:**

@@ -75,21 +75,7 @@ RUN git clone https://github.com/Cantera/cantera.git -b 3.1 --depth=1 \
 &&  cd ../ \
 &&  rm -r cantera
 
-############## Build hips
-# note,
-# git clone https://github.com/BYUignite/hips.git --depth=1 --branch v1.0 \
-# will download version tagged v1.0, and similarly for other tags
-
-# RUN git clone https://github.com/BYUignite/hips.git --depth=1 \
-# && cd hips \
-# &&  mkdir build \
-# &&  cd build \
-# &&  cmake -D REACTIONS_ENABLED=ON -D HIPS_BUILD_DOCS=ON -D HIPS_BUILD_EXAMPLES=ON -D HIPB_BUILD_TESTS=ON .. \
-# &&  make -j \
-# &&  make install \
-# &&  cd ../
-
-# Set the working directory
+############## Build hips with entrypoint script
 WORKDIR /app/hips
 
 RUN cat > /entrypoint.sh << 'EOF' && chmod +x /entrypoint.sh
