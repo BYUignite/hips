@@ -42,7 +42,7 @@ This code implements the Hierarchal Parcel Swapping (HiPS) model for turbulent r
       is called with `shouldWriteData` set to `true`.
     * A subfolder is generated with a name corresponding to the case name specified in the run script (e.g., `rlz_00001` by default).
     * The number of realization folders corresponds to the number of realizations specified by the user.
-* `docker/`: Contains the Dockerfile and bash script to easily use HiPS with Docker.  
+* `docker/`: Contains the Dockerfile along with a bash script to easily use HiPS with Docker.  
 
 * `docs/`: Contains documentation built with Doxygen.
 
