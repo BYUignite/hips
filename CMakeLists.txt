@@ -21,6 +21,8 @@ set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/installed")
 
 # ---- Build options ----
 
+option(BUILD_PYTHON_INTERFACE  "build python interface"  ON)
+
 option(REACTIONS_ENABLED     "Enable reactions"           OFF)
 option(HIPS_BUILD_EXAMPLES   "Build hips examples"        ON)
 option(HIPS_BUILD_DOCS       "Build hips documentation"   OFF)
@@ -32,9 +34,15 @@ endif()
 
 ################### MAIN PROJECT TARGETS #####################
 
-add_subdirectory(src)
+add_subdirectory(src/c++)
 
 ################### OPTIONAL PROJECT TARGETS #################
+
+# ------------- PYTHON INTERFACE
+
+if(BUILD_PYTHON_INTERFACE)
+    add_subdirectory(src/python)
+endif()
 
 # -------- EXAMPLES --------
 

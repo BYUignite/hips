@@ -25,6 +25,11 @@ This code implements the Hierarchal Parcel Swapping (HiPS) model for turbulent r
       ```
 
 * `src/`: Contains all source code for the HiPS implementation.
+    * `src/c++` contains C++ source files. 
+    * `src/python` contains a Python interface to the c++ hips class built using Cython.
+        * To build the Python interface, set the related flag in the top-level `CMakeLists.txt` file.
+        * There is an example in `examples/ex_1.py` that can be run with `python ex_1.py`
+        * Note, you need to add the path to the python library to your `PYTHONPATH` environment variable in your .bashrc or .zshrc file.
 
 * `example/`: Contains three default example cases that users can run to get started.
 

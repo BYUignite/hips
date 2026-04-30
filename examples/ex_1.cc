@@ -52,7 +52,7 @@ int main() {
     double tau0 = 1.0;                         // Initial time scale for the largest eddies
     double C_param = 0.5;                      // Eddy turnover rate multiplier
     double tRun = 300.0;                       // Total simulation time
-    int forceTurb = 2;                         // Forcing parameter to impose turbulent profile
+    bool forceTurb = true;                         // Forcing parameter to impose turbulent profile
     vector<double> ScHips = {0.0625, 1.0, 16.0};    // Schmidt numbers for low and high diffusivity
     int numVariables = 3;                      // Number of scalar fields
 
