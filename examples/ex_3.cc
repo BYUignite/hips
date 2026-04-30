@@ -29,7 +29,7 @@ using namespace std;
 int main() {
 
     double C_param = 0.5;             // Eddy turnover rate multiplier
-    int forceTurb = 2;                // Forcing parameter to impose turbulent profile
+    bool forceTurb = true;            // Forcing parameter to impose turbulent profile
     int nVar = 1;                     // Number of scalar fields
     vector<double> ScHips = {1.0};    // Schmidt numbers for low and high diffusivity
     bool performReaction = false;
