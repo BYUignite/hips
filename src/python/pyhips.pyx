@@ -18,10 +18,10 @@ cdef extern from "../c++/hips.h":
     cdef cppclass hips:
 
         hips(double, bool, int, vector[double]&,
-             bool, shared_ptr[void], int, int) except +
+             bool, string, double, int, int) except +
 
         hips(int, double, double, double, bool, int,
-             vector[double]&, bool, shared_ptr[void], int, int) except +
+             vector[double]&, bool, string, double, int, int) except +
 
         void set_tree(int, double, double)
         void set_tree(double, double, double, string)
@@ -76,26 +76,26 @@ cdef class pyhips:
                   int nVar,
                   ScHips,
                   bint performReaction,
-                  vcantSol=None,
+                  mechanismName="",
+                  P=101325.0,
                   int seed=10,
                   int realization=1,
                   nLevels=None,
                   domainLength=None,
                   tau0=None):
         cdef vector[double] sc_hips = _as_vector_double(ScHips)
+        cdef string mechanism_name = mechanismName.encode("utf-8")
 
         self.hipsptr = NULL
-        if vcantSol is not None:
-            raise NotImplementedError("Python wrapper does not yet support vcantSol")
 
         if nLevels is None and domainLength is None and tau0 is None:
             self.hipsptr = new hips(C_param, forceTurb, nVar, sc_hips,
-                                    performReaction, shared_ptr[void](),
+                                    performReaction, mechanism_name, P,
                                     seed, realization)
         elif nLevels is not None and domainLength is not None and tau0 is not None:
             self.hipsptr = new hips(nLevels, domainLength, tau0, C_param,
                                     forceTurb, nVar, sc_hips,
-                                    performReaction, shared_ptr[void](),
+                                    performReaction, mechanism_name, P,
                                     seed, realization)
         else:
             raise ValueError("Provide either all of nLevels/domainLength/tau0 or none of them")

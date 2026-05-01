@@ -28,7 +28,9 @@ public:
 
 #ifdef REACTIONS_ENABLED
     std::shared_ptr<Cantera::ThermoPhase> gas;                     ///< Shared pointer to a Cantera thermochemistry object
-    std::shared_ptr<batchReactor> bRxr;                            ///< Unique pointer to the integrator object
+    std::shared_ptr<batchReactor> bRxr;                            ///< Shared pointer to the integrator object
+    static std::shared_ptr<Cantera::Solution> sol;                 ///< Used for creating a Cantera object in this class instead of passing it through the constructor (for the Python interface)
+    double P;                                                      ///< system pressure (Pa)
 #endif
 
     double domainLength;                                           ///< length of domain (m)
@@ -66,7 +68,7 @@ private:
     randomGenerator rand;                                               
     
     std::vector<int> i_plus;                                       ///< ceil(i_batchelor)
-    std::vector<double> ScHips;                                    ///< vector containing Schmidt numbers related to each variable
+    std::vector<double> ScHips;                                    ///< vector containing Schmidt numbers related to each variable 
     std::vector<std::string> varName;                              ///< vector containing the names of parcel variables
     std::vector<double> parcelTimes;                               ///< current times corresponding to the parcel states
     std::vector<double> levelRates;                                ///< list of eddy event rates at each level
@@ -224,6 +226,20 @@ public:
          std::vector<double> &ScHips_,
          bool performReaction,
          std::shared_ptr<void> vcantSol = nullptr,
+         double P_=101325,
+         int seed = 10,
+         int realization_ = 1);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Version is the same as the previous one with mechanismName string replacing vcantSol pointer.
+
+    hips(double C_param_,
+         bool forceTurb_,
+         int nVar_,
+         std::vector<double> &ScHips_,
+         bool performReaction,
+         std::string mechanismName,
+         double P_=101325,
          int seed = 10,
          int realization_ = 1);
 
@@ -257,7 +273,6 @@ public:
 /// \see hips::set_tree() for the internal tree setup logic.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
     hips(int nLevels_,
          double domainLength_,
          double tau0_,
@@ -267,6 +282,23 @@ public:
          std::vector<double> &ScHips_,
          bool performReaction,
          std::shared_ptr<void> vcantSol = nullptr,
+         double P_=101325,
+         int seed = 10, 
+         int realization_ = 1);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Version is the same as the previous one with mechanismName string replacing vcantSol pointer.
+
+    hips(int nLevels_,
+         double domainLength_,
+         double tau0_,
+         double C_param_,
+         bool forceTurb_,
+         int nVar_,
+         std::vector<double> &ScHips_,
+         bool performReaction,
+         std::string mechanismName,
+         double P_=101325,
          int seed = 10, 
          int realization_ = 1);
 

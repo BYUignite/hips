@@ -38,6 +38,11 @@ if (Python3_EXECUTABLE AND BUILD_PYTHON_INTERFACE)
         set(HIPS_COMPILE_DEFINITIONS)
     endif()
 
+    if(REACTIONS_ENABLED)
+        list(APPEND HIPS_COMPILE_DEFINITIONS REACTIONS_ENABLED)
+    endif()
+    list(REMOVE_DUPLICATES HIPS_COMPILE_DEFINITIONS)
+
     list(JOIN PYHIPS_SOURCES ",\n                " PYHIPS_SOURCES_PY)
 
     set(PYHIPS_INCLUDE_DIRS "    '${CMAKE_CURRENT_SOURCE_DIR}/../c++',\n")
@@ -53,12 +58,13 @@ if (Python3_EXECUTABLE AND BUILD_PYTHON_INTERFACE)
         string(APPEND PYHIPS_LIBRARY_DIRS "    '${dir}',\n")
     endforeach()
 
-    set(PYHIPS_LIBRARIES "")
+    set(PYHIPS_LINK_ARGS "")
     foreach(lib IN LISTS HIPS_LINK_LIBRARIES)
-        string(APPEND PYHIPS_LIBRARIES "    '${lib}',\n")
+        string(APPEND PYHIPS_LINK_ARGS "    '${lib}',\n")
     endforeach()
 
     set(PYHIPS_DEFINE_MACROS "")
+    list(REMOVE_DUPLICATES HIPS_COMPILE_DEFINITIONS)
     foreach(def IN LISTS HIPS_COMPILE_DEFINITIONS)
         string(APPEND PYHIPS_DEFINE_MACROS "    ('${def}', None),\n")
     endforeach()

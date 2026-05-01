@@ -58,8 +58,7 @@ int main() {
 
     // Set up HiPS tree and calculate the number of parcels
     hips HiPS(nLevels, domainLength, tau0, C_param, forceTurb, numVariables, ScHips, false);
-    int numParcels = HiPS.get_nparcels()
-;
+    int numParcels = HiPS.get_nparcels() ;
 
     // Initialize mixing fractions for each scalar variable
     vector<vector<double>> mixingFractions(numVariables);

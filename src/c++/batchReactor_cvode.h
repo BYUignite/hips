@@ -23,7 +23,7 @@ public:
 
     batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSol);
 
-    virtual void react(double &h, std::vector<double> &y, const double tRun);
+    virtual void react(double &h, double &P, std::vector<double> &y, const double tRun);
 
     int rhsf(const double t, const double *vars, double *dvarsdt);  // dydt = rhsf
     

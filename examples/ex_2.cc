@@ -39,6 +39,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -58,9 +59,11 @@ int main() {
     auto gas = cantSol->thermo();
     size_t nsp = gas->nSpecies();
     int nVar = nsp + 1; // Number of variables (species + enthalpy)
+    double P = 101325.0;
+    int seed = 11;
 
     // Create HiPS instance with reaction support
-    hips HiPS(nLevels, domainLength, tau0, C_param, forceTurb, nVar, ScHips, true, cantSol, 11);
+    hips HiPS(nLevels, domainLength, tau0, C_param, forceTurb, nVar, ScHips, true, cantSol, P, seed);
 
     int nparcels = HiPS.get_nparcels();
 

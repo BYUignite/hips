@@ -47,11 +47,11 @@ batchReactor_cvode::batchReactor_cvode(std::shared_ptr<Cantera::Solution> cantSo
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-void batchReactor_cvode::react(double &h, std::vector<double> &y, const double tRun) {
+void batchReactor_cvode::react(double &h, double &P, std::vector<double> &y, const double tRun) {
 
     // Store fixed enthalpy and pressure
     h_fixed = h;
-    P_fixed = gas->pressure();
+    P_fixed = P;
 
     // Integrate over the given time
     integrator->integrate(y, tRun);

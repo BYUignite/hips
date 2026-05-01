@@ -34,7 +34,7 @@ public:
 
     batchReactor() {};
 
-    virtual void react(double &h, std::vector<double> &y, const double tRun) = 0;
+    virtual void react(double &h, double &P, std::vector<double> &y, const double tRun) = 0;
     double getDensity() const { return rho; }       
     
 };

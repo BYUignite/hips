@@ -21,6 +21,7 @@
 #ifdef REACTIONS_ENABLED
 #include "batchReactor_cvode.h"
 #include "batchReactor_cantera.h"
+std::shared_ptr<Cantera::Solution> hips::sol = nullptr;
 #endif
 
 #include "randomGenerator.h"
@@ -45,6 +46,7 @@ hips::hips(int nLevels_,
            vector<double> &ScHips_,
            bool performReaction_,
            shared_ptr<void> vcantSol,
+           double P_,
            int seed,
            int realization_): 
     nLevels(nLevels_), 
@@ -54,6 +56,7 @@ hips::hips(int nLevels_,
     forceTurb(forceTurb_),       
     ScHips(ScHips_),   
     nVar(nVar_),                                     
+    P(P_),
     rand(seed),
     performReaction(performReaction_),
     realization(realization_){
@@ -63,11 +66,57 @@ hips::hips(int nLevels_,
         shared_ptr<Cantera::Solution> cantSol = static_pointer_cast<Cantera::Solution>(vcantSol);
         gas = cantSol->thermo(); 
         nsp = gas->nSpecies();
-
         bRxr = make_shared<batchReactor_cvode>(cantSol);                                // By default, use batchReactor_cvode
-
         // Uncomment the following line to switch to batchReactor_cantera
         // bRxr = make_unique<batchReactor_cantera>(cantSol);
+
+        if(forceTurb)
+            throw std::runtime_error("Error: forceTurb should be false if preformReaction is true");
+    }
+    #endif
+
+    // Resize vectors to the number of variables
+    varData.resize(nVar);
+    varName.resize(nVar); 
+
+    set_tree(nLevels, domainLength, tau0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Version is the same as the previous one with mechanismName string replacing vcantSol pointer.
+
+hips::hips(int nLevels_, 
+           double domainLength_, 
+           double tau0_, 
+           double C_param_, 
+           bool forceTurb_,
+           int nVar_,
+           vector<double> &ScHips_,
+           bool performReaction_,
+           string mechanismName,
+           double P_,
+           int seed,
+           int realization_): 
+    nLevels(nLevels_), 
+    domainLength(domainLength_), 
+    tau0(tau0_),
+    C_param(C_param_), 
+    forceTurb(forceTurb_),       
+    ScHips(ScHips_),   
+    nVar(nVar_),                                     
+    P(P_),
+    rand(seed),
+    performReaction(performReaction_),
+    realization(realization_){
+
+    #ifdef REACTIONS_ENABLED
+    if(performReaction) {
+        if(!sol) sol = Cantera::newSolution(mechanismName);
+        gas = sol->thermo(); 
+        nsp = gas->nSpecies();
+        bRxr = make_shared<batchReactor_cvode>(sol);                          // By default, use batchReactor_cvode
+        // Uncomment the following line to switch to batchReactor_cantera
+        // bRxr = make_shared<batchReactor_cantera>(sol);
 
         if(forceTurb)
             throw std::runtime_error("Error: forceTurb should be false if preformReaction is true");
@@ -89,12 +138,14 @@ hips::hips(double C_param_,
            vector<double> &ScHips_,
            bool performReaction_,
            shared_ptr<void> vcantSol,
+           double P_,
            int seed,
            int realization_): 
     C_param(C_param_), 
     forceTurb(forceTurb_),       
     nVar(nVar_),                       
     ScHips(ScHips_),                 
+    P(P_),
     rand(seed),
     performReaction(performReaction_),
     realization(realization_){
@@ -107,7 +158,7 @@ hips::hips(double C_param_,
         nsp = gas->nSpecies();
 
         // Set up the default batch reactor (cvode).
-       // bRxr = make_shared<batchReactor_cvode>(cantSol);
+        // bRxr = make_shared<batchReactor_cvode>(cantSol);
 
         // Uncomment the following line to switch to batchReactor_cantera.
          bRxr = make_shared<batchReactor_cantera>(cantSol);
@@ -118,6 +169,47 @@ hips::hips(double C_param_,
     varData.resize(nVar);
     varName.resize(nVar);        
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+hips::hips(double C_param_, 
+           bool forceTurb_,
+           int nVar_,
+           vector<double> &ScHips_,
+           bool performReaction_,
+           string mechanismName,
+           double P_,
+           int seed,
+           int realization_): 
+    C_param(C_param_), 
+    forceTurb(forceTurb_),       
+    nVar(nVar_),                       
+    ScHips(ScHips_),                 
+    P(P_),
+    rand(seed),
+    performReaction(performReaction_),
+    realization(realization_){
+
+    #ifdef REACTIONS_ENABLED
+    // Initialize Cantera thermo phase and species count.
+    if(performReaction) {
+        if(!sol) sol = Cantera::newSolution(mechanismName);
+        gas = sol->thermo(); 
+        nsp = gas->nSpecies();
+
+        // Set up the default batch reactor (cvode).
+        // bRxr = make_shared<batchReactor_cvode>(cantSol);
+
+        // Uncomment the following line to switch to batchReactor_cantera.
+        bRxr = make_shared<batchReactor_cantera>(sol);
+    }
+    #endif
+
+    // Resize vectors to accommodate the number of variables.
+    varData.resize(nVar);
+    varName.resize(nVar);        
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -961,7 +1053,7 @@ void hips::reactParcels_LevelTree(const int iLevel, const int iTree) {
 
         if (performReaction) {
             // Advance chemistry; bRxr updates its state internally
-            bRxr->react(h, y, dt);
+            bRxr->react(h, P, y, dt);
 
             // Get new density from the reactor/EOS
             const double rho_new = bRxr->getDensity();
@@ -1222,7 +1314,7 @@ void hips::writeData(int real, const int ifile, const double outputTime) {
             for(int k=0; k<nsp; k++)
                 yy[k] = (*varData[k+1])[pLoc[i]];
             gas->setMassFractions(yy.data());
-            gas->setState_HP((*varData[0])[pLoc[i]], gas->pressure());
+            gas->setState_HP((*varData[0])[pLoc[i]], P);
             ofile << setw(19) << gas->temperature();
         }
         #endif

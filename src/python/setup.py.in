@@ -7,8 +7,8 @@ include_dirs = [
 @PYHIPS_INCLUDE_DIRS@]
 library_dirs = [
 @PYHIPS_LIBRARY_DIRS@]
-libraries = [
-@PYHIPS_LIBRARIES@]
+link_args = [
+@PYHIPS_LINK_ARGS@]
 define_macros = [
 @PYHIPS_DEFINE_MACROS@]
 
@@ -17,8 +17,8 @@ setup(ext_modules=[Extension('pyhips',
                              language='c++',
                              include_dirs=include_dirs,
                              library_dirs=library_dirs,
-                             libraries=libraries,
                              define_macros=define_macros,
+                             extra_link_args=link_args,
                              extra_compile_args=['-std=c++20', '-O3'])],
       name='@PYHIPS_PACKAGE_NAME@',
       version='@PYHIPS_PACKAGE_VERSION@',

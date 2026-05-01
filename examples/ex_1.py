@@ -1,3 +1,8 @@
+# execution: python ex_1.py
+# make sure the pyhips library path is in your PYTHONPATH environment variable
+
+###############################################################################
+
 import pyhips
 import numpy as np
 
@@ -12,20 +17,19 @@ forceTurb = True
 ScHips = np.array([0.065, 1.0, 16.0])
 numVariables = 3
 doReaction = False
-writeData = True
 seed = 10
 realization = 1
-vcantSol = None
+mechanismName = ""
 
 #--------------------------- setup the tree
 
 # Option 1 of 2
-hips = pyhips.pyhips(C_param, forceTurb, numVariables, ScHips, doReaction, vcantSol, seed, realization)
+hips = pyhips.pyhips(C_param, forceTurb, numVariables, ScHips, doReaction, mechanismName, seed, realization)
 hips.set_tree(nLevels, domainLength, tau0)
 
 # Option 2 of 2 (same results)
 #hips = pyhips.pyhips(C_param, forceTurb, numVariables, ScHips, doReaction, \
-#                     vcantSol, seed, realization, nLevels, domainLength, tau0)
+#                     mechanismName, seed, realization, nLevels, domainLength, tau0)
 
 #--------------------------- set the data
 
@@ -47,7 +51,8 @@ hips.writeData(1, 0, 0.0)
 
 hips.setOutputIntervalTime(60.0)
 
-hips.calculateSolution(tRun, writeData)
+doWrite = True
+hips.calculateSolution(tRun, doWrite)
 
 #=========================== recover the data (projected)
 

@@ -32,14 +32,14 @@ batchReactor_cantera::batchReactor_cantera(std::shared_ptr<Cantera::Solution> ca
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
-void batchReactor_cantera::react(double &h, std::vector<double> &y, const double tRun) {
+void batchReactor_cantera::react(double &h, double &P, std::vector<double> &y, const double tRun) {
     // Set mass fractions and state
     gas->setMassFractions(&y[0]);
     gas->setState_HP(h, gas->pressure());
 
     // Store fixed enthalpy and pressure
     h_fixed = h;
-    P_fixed = gas->pressure();
+    P_fixed = P;
 
     // Reinitialize the integrator
     integrator->reinitialize(0.0, *this);
