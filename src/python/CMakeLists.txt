@@ -6,13 +6,13 @@ if (Python3_EXECUTABLE AND BUILD_PYTHON_INTERFACE)
     set(PYHIPS_PACKAGE_NAME "pyhips")
     set(PYHIPS_PACKAGE_VERSION "${PROJECT_VERSION}")
 
-    set(PYHIPS_SOURCES
+    set(PYHIPS_EXTENSION_SOURCES
         "'${CMAKE_CURRENT_SOURCE_DIR}/pyhips.pyx'"
         "'${CMAKE_CURRENT_SOURCE_DIR}/../c++/hips.cc'"
     )
 
     if(REACTIONS_ENABLED)
-        list(APPEND PYHIPS_SOURCES
+        list(APPEND PYHIPS_EXTENSION_SOURCES
             "'${CMAKE_CURRENT_SOURCE_DIR}/../c++/batchReactor_cvode.cc'"
             "'${CMAKE_CURRENT_SOURCE_DIR}/../c++/batchReactor_cantera.cc'"
         )
@@ -43,9 +43,29 @@ if (Python3_EXECUTABLE AND BUILD_PYTHON_INTERFACE)
     endif()
     list(REMOVE_DUPLICATES HIPS_COMPILE_DEFINITIONS)
 
-    list(JOIN PYHIPS_SOURCES ",\n                " PYHIPS_SOURCES_PY)
+    list(JOIN PYHIPS_EXTENSION_SOURCES ",\n                " PYHIPS_EXTENSION_SOURCES_PY)
+
+    set(PYCGAS_EXTENSION_BLOCK "")
+    if(REACTIONS_ENABLED)
+        set(PYCGAS_EXTENSION_SOURCES
+            "'${CMAKE_CURRENT_SOURCE_DIR}/pycgas.pyx'"
+        )
+        list(JOIN PYCGAS_EXTENSION_SOURCES ",\n                " PYCGAS_EXTENSION_SOURCES_PY)
+        set(PYCGAS_EXTENSION_BLOCK "
+    Extension('pycgas',
+              sources=[${PYCGAS_EXTENSION_SOURCES_PY}],
+              language='c++',
+              include_dirs=include_dirs,
+              library_dirs=library_dirs,
+              define_macros=define_macros,
+              extra_link_args=link_args,
+              extra_compile_args=['-std=c++20', '-O3']),")
+    endif()
 
     set(PYHIPS_INCLUDE_DIRS "    '${CMAKE_CURRENT_SOURCE_DIR}/../c++',\n")
+    if(REACTIONS_ENABLED)
+        string(APPEND PYHIPS_INCLUDE_DIRS "    '${CMAKE_CURRENT_SOURCE_DIR}/../c++/test',\n")
+    endif()
     foreach(dir IN LISTS HIPS_INCLUDE_DIRS)
         if(dir MATCHES "\\$<")
             continue()

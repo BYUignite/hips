@@ -23,6 +23,12 @@ if(REACTIONS_ENABLED)
     target_link_libraries(ex_2.x PRIVATE hips ${CANTERA})
     install(TARGETS ex_2.x DESTINATION "${PROJECT_SOURCE_DIR}/run")
 
+    add_executable(ex_t.x ex_t.cc)
+    target_include_directories(ex_t.x PUBLIC "$ENV{CONDA_PREFIX}/include")
+    target_link_directories(ex_t.x PUBLIC "$ENV{CONDA_PREFIX}/lib")
+    target_link_libraries(ex_t.x PRIVATE hips ${CANTERA})
+    install(TARGETS ex_t.x DESTINATION "${PROJECT_SOURCE_DIR}/run")
+
 endif()
 
 #---------- Example 3

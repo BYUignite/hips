@@ -1,1 +1,1 @@
-rm -f pyhips.cpp setup.py    
+rm -f pyhips.cpp pycgas.cpp setup.py    

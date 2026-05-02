@@ -4,18 +4,9 @@
 
 ###############################################################################
 
-#doldb import cantera as ct
 import pyhips
+import pycgas
 import numpy as np
-
-import pickle
-
-with open('data.pkl', 'rb') as f:
-    h = pickle.load(f)
-    rho = pickle.load(f)
-    ysp = pickle.load(f)
-    variableNames = pickle.load(f)
-    w = pickle.load(f)
 
 #--------------------------- set parameters
 
@@ -31,10 +22,11 @@ realization = 1
 mechanismName = "gri30.yaml"
 P = 101325.
 
-#doldb gas = ct.Solution(mechanismName)
-nsp = 53 #doldb gas.n_species
+gas = pycgas.pycgas(mechanismName)
+nsp = gas.nSpecies()
 nVar = nsp + 1
 ScHips = np.ones(nVar)
+
 
 #--------------------------- setup the tree
 
@@ -43,39 +35,39 @@ hips = pyhips.pyhips(C_param, forceTurb, nVar, ScHips, doReaction, \
 
 #--------------------------- set the data
 
-nparcels = 128 #hips.get_nparcels()
+nparcels = hips.get_nparcels()
 fracBurn = 0.25
 
-#doldb ysp = np.zeros((nsp, nparcels))
-#doldb h = np.zeros(nparcels)
-#doldb rho = np.zeros(nparcels)
+ysp = np.zeros((nsp, nparcels))
+h = np.zeros(nparcels)
+rho = np.zeros(nparcels)
 
 T0 = 300.0
 T1 = 300.0
 composition = "C2H4:1, O2:3, N2:11.25"
 
-#doldb #---------- initialize fresh reactants
-#doldb 
-#doldb gas.TPX = T0, ct.one_atm, composition
-#doldb 
-#doldb freshEnd = int((1.0 - fracBurn) * nparcels)
-#doldb h[:freshEnd+1] = gas.enthalpy_mass
-#doldb rho[:freshEnd+1] =gas.density
-#doldb for i in range(nsp):
-#doldb     ysp[i, :freshEnd+1] = gas.Y[i]
-#doldb 
-#doldb #---------- initialize combusted parcels
-#doldb 
-#doldb gas.TPX = T1, ct.one_atm, composition
-#doldb gas.equilibrate("HP")
-#doldb 
-#doldb h[freshEnd + 1:] = gas.enthalpy_mass
-#doldb rho[freshEnd + 1:] = gas.density
-#doldb for i in range(nsp):
-#doldb     ysp[i, freshEnd+1:] = gas.Y[i]
-#doldb 
-#doldb variableNames = ["enthalpy"] + gas.species_names
-#doldb w = np.ones(nparcels) / nparcels
+#---------- initialize fresh reactants
+
+gas.setState_TPX(T0, P, composition)
+
+freshEnd = int((1.0 - fracBurn) * nparcels)
+h[:freshEnd+1] = gas.enthalpy_mass()
+rho[:freshEnd+1] = gas.density()
+for i in range(nsp):
+    ysp[i, :freshEnd+1] = gas.getMassFractions()[i]
+
+#---------- initialize combusted parcels
+
+gas.setState_TPX(T1, P, composition)
+gas.equilibrate("HP")
+
+h[freshEnd + 1:] = gas.enthalpy_mass()
+rho[freshEnd + 1:] = gas.density()
+for i in range(nsp):
+    ysp[i, freshEnd+1:] = gas.getMassFractions()[i]
+
+variableNames = ["enthalpy"] + gas.speciesNames()
+w = np.ones(nparcels) / nparcels
 
 ##############################################################
 

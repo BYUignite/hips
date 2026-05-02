@@ -2,7 +2,7 @@ from distutils.core      import setup, Extension
 from Cython.Distutils    import build_ext
 from distutils.extension import Extension
 
-sources_list = [@PYHIPS_SOURCES_PY@]
+pyhips_sources = [@PYHIPS_EXTENSION_SOURCES_PY@]
 include_dirs = [
 @PYHIPS_INCLUDE_DIRS@]
 library_dirs = [
@@ -12,14 +12,18 @@ link_args = [
 define_macros = [
 @PYHIPS_DEFINE_MACROS@]
 
-setup(ext_modules=[Extension('pyhips', 
-                             sources=sources_list,
-                             language='c++',
-                             include_dirs=include_dirs,
-                             library_dirs=library_dirs,
-                             define_macros=define_macros,
-                             extra_link_args=link_args,
-                             extra_compile_args=['-std=c++20', '-O3'])],
+ext_modules = [Extension('pyhips',
+                         sources=pyhips_sources,
+                         language='c++',
+                         include_dirs=include_dirs,
+                         library_dirs=library_dirs,
+                         define_macros=define_macros,
+                         extra_link_args=link_args,
+                         extra_compile_args=['-std=c++20', '-O3']),
+@PYCGAS_EXTENSION_BLOCK@
+]
+
+setup(ext_modules=ext_modules,
       name='@PYHIPS_PACKAGE_NAME@',
       version='@PYHIPS_PACKAGE_VERSION@',
       cmdclass={'build_ext':build_ext})
